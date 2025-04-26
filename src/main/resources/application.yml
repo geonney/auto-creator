@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: auto-creator
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/test
+    driver-class-name: org.postgresql.Driver
+    username: test_user
+    password: test!@34
