@@ -1,68 +1,151 @@
 package studio.geonlee.auto_creator.generator;
 
+import studio.geonlee.auto_creator.common.enumeration.DatabaseType;
+import studio.geonlee.auto_creator.common.record.FieldMetadata;
 import studio.geonlee.auto_creator.context.DatabaseContext;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
-import java.util.HashMap;
-import java.util.Map;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author GEON
  * @since 2025-04-25
  **/
-public class EntityGenerator {
-    private static final Map<String, String> typeMap = new HashMap<>();
-    static {
-        typeMap.put("varchar", "String");
-        typeMap.put("text", "String");
-        typeMap.put("char", "String");
-        typeMap.put("uuid", "String");
+public class EntityCodeGenerator {
 
-        typeMap.put("int4", "Integer");
-        typeMap.put("integer", "Integer");
-        typeMap.put("int8", "Long");
-        typeMap.put("bigint", "Long");
-
-        typeMap.put("bool", "Boolean");
-        typeMap.put("boolean", "Boolean");
-
-        typeMap.put("date", "LocalDate");
-        typeMap.put("timestamp", "LocalDateTime");
-        typeMap.put("timestamp without time zone", "LocalDateTime");
-    }
-
-    public static String generate(String className, String tableName) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("package com.example.entity;\n\n");
-        sb.append("import lombok.Getter;\n");
-        sb.append("import lombok.Setter;\n\n");
-        sb.append("import java.time.*;\n\n");
-        sb.append("@Getter\n@Setter\n");
-        sb.append("public class ").append(className).append(" {\n\n");
-
+    public static String generate(String className, String tableName, String schema, DatabaseType databaseType) {
         try {
             Connection conn = DatabaseContext.getConnection();
-            String schema = "public"; // 필요시 사용자 설정 반영 가능
-            DatabaseMetaData meta = conn.getMetaData();
-            ResultSet rs = meta.getColumns(null, schema, tableName, null);
+            List<FieldMetadata> fields = extractFieldMetadata(conn, schema, tableName, databaseType);
 
-            while (rs.next()) {
-                String columnName = rs.getString("COLUMN_NAME");
-                String typeName = rs.getString("TYPE_NAME").toLowerCase();
+            List<FieldMetadata> pkFields = fields.stream().filter(FieldMetadata::primaryKey).toList();
+            List<FieldMetadata> nonPkFields = fields.stream().filter(f -> !f.primaryKey()).toList();
 
-                String javaType = typeMap.getOrDefault(typeName, "String"); // fallback: String
+            boolean isCompositePk = pkFields.size() > 1;
 
-                sb.append("    private ").append(javaType)
-                        .append(" ").append(columnName).append(";\n");
+            StringBuilder sb = new StringBuilder();
+            sb.append("package studio.geonlee.entity;\n\n");
+            sb.append("import jakarta.persistence.*;\n");
+            sb.append("import lombok.Getter;\nimport lombok.Setter;\n");
+            sb.append("import java.time.*;\n\n");
+            boolean usesBigDecimal = fields.stream()
+                    .anyMatch(f -> f.javaType().equals("BigDecimal"));
+
+            if (usesBigDecimal) {
+                sb.append("import java.math.BigDecimal;\n");
             }
 
+            sb.append("@Getter\n@Setter\n@Entity\n");
+            sb.append("@Table(name = \"").append(tableName).append("\")\n");
+            sb.append("public class ").append(className).append(" {\n\n");
+
+            // 복합키 처리
+            if (isCompositePk) {
+                sb.append("    @EmbeddedId\n");
+                sb.append("    private ").append(className).append("Id id;\n\n");
+            } else {
+                for (FieldMetadata field : pkFields) {
+                    if (field.comment() != null && !field.comment().isBlank()) {
+                        sb.append("    /** ").append(field.comment()).append(" */\n");
+                    }
+                    sb.append("    @Id\n");
+                    sb.append(generateColumnAnnotation(field));
+                    sb.append("    private ").append(field.javaType()).append(" ").append(field.fieldName()).append(";\n\n");
+                }
+            }
+
+            // 나머지 필드
+            for (FieldMetadata field : nonPkFields) {
+                if (field.comment() != null && !field.comment().isBlank()) {
+                    sb.append("    /** ").append(field.comment()).append(" */\n");
+                }
+                sb.append(generateColumnAnnotation(field));
+                sb.append("    private ").append(field.javaType()).append(" ").append(field.fieldName()).append(";\n\n");
+            }
+
+            sb.append("}\n");
+
+            // 복합키 클래스도 함께 생성
+            if (isCompositePk) {
+                sb.append("\n\n").append(generateEmbeddedId(className + "Id", pkFields));
+            }
+
+            return sb.toString();
+
         } catch (Exception e) {
-            return "// 오류 발생: " + e.getMessage();
+            return "// ❌ Entity 생성 실패: " + e.getMessage();
+        }
+    }
+
+    public static List<FieldMetadata> extractFieldMetadata(Connection conn, String schema, String tableName, DatabaseType dbType) throws SQLException {
+        List<FieldMetadata> list = new ArrayList<>();
+
+        Set<String> pkSet = new HashSet<>();
+        ResultSet pkRs = conn.getMetaData().getPrimaryKeys(null, schema, tableName);
+        while (pkRs.next()) {
+            pkSet.add(pkRs.getString("COLUMN_NAME"));
+        }
+
+        ResultSet rs = conn.getMetaData().getColumns(null, schema, tableName, null);
+        while (rs.next()) {
+            String columnName = rs.getString("COLUMN_NAME");
+            String typeName = rs.getString("TYPE_NAME");
+            boolean isPk = pkSet.contains(columnName);
+            boolean nullable = rs.getInt("NULLABLE") == DatabaseMetaData.columnNullable;
+            int length = rs.getInt("COLUMN_SIZE");
+            String columnDefault = rs.getString("COLUMN_DEF"); // 기본값
+            String remarks = rs.getString("REMARKS");          // 주석
+
+            list.add(FieldMetadata.of(
+                    dbType, columnName, typeName, isPk, nullable, length, columnDefault, remarks
+            ));
+        }
+
+        return list;
+    }
+
+    private static String generateEmbeddedId(String className, List<FieldMetadata> pkFields) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("@Getter\n@Setter\n@EqualsAndHashCode\n@Embeddable\n");
+        sb.append("public class ").append(className).append(" {\n\n");
+
+        for (FieldMetadata field : pkFields) {
+            if (field.comment() != null && !field.comment().isBlank()) {
+                sb.append("    /** ").append(field.comment()).append(" */\n");
+            }
+            sb.append(generateColumnAnnotation(field));
+            sb.append("    private ").append(field.javaType()).append(" ").append(field.fieldName()).append(";\n\n");
         }
 
         sb.append("}\n");
+        return sb.toString();
+    }
+
+    private static String generateColumnAnnotation(FieldMetadata field) {
+        StringBuilder sb = new StringBuilder("    @Column(name = \"")
+                .append(field.columnName()).append("\"");
+
+        if (!field.nullable()) {
+            sb.append(", nullable = false");
+        }
+
+        if (field.javaType().equals("String") && field.length() > 0) {
+            sb.append(", length = ").append(field.length());
+        }
+
+        if (field.columnDefault() != null && !field.columnDefault().isBlank()) {
+            String def = field.columnDefault().replace("\"", "\\\"");
+            sb.append(", columnDefinition = \"default ").append(def).append("\"");
+        }
+
+        sb.append(")\n");
         return sb.toString();
     }
 }
