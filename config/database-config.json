@@ -1,0 +1,8 @@
+{
+  "databaseType" : "POSTGRESQL",
+  "host" : "localhost",
+  "port" : 5432,
+  "user" : "test_user",
+  "password" : "test!@34",
+  "databaseName" : "test"
+}
