@@ -2,6 +2,8 @@ package studio.geonlee.auto_creator.generator;
 
 import studio.geonlee.auto_creator.common.enumeration.DatabaseType;
 import studio.geonlee.auto_creator.common.record.FieldMetadata;
+import studio.geonlee.auto_creator.config.DefaultConfigFileHandler;
+import studio.geonlee.auto_creator.config.dto.DefaultConfig;
 import studio.geonlee.auto_creator.context.DatabaseContext;
 
 import java.sql.Connection;
@@ -30,7 +32,11 @@ public class EntityCodeGenerator {
             boolean isCompositePk = pkFields.size() > 1;
 
             StringBuilder sb = new StringBuilder();
-            sb.append("package studio.geonlee.entity;\n\n");
+
+            DefaultConfig config = DefaultConfigFileHandler.load();
+            String entityBasePackage = config.getEntityBasePackage();
+
+            sb.append("package ").append(entityBasePackage).append(";").append("\n\n");
             sb.append("import jakarta.persistence.*;\n");
             sb.append("import lombok.Getter;\nimport lombok.Setter;\n");
             sb.append("import java.time.*;\n\n");

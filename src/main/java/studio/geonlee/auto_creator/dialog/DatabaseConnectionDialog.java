@@ -1,7 +1,7 @@
 package studio.geonlee.auto_creator.dialog;
 
 import studio.geonlee.auto_creator.common.enumeration.DatabaseType;
-import studio.geonlee.auto_creator.config.DatabaseConfig;
+import studio.geonlee.auto_creator.config.dto.DatabaseConfig;
 import studio.geonlee.auto_creator.config.DatabaseConfigFileHandler;
 import studio.geonlee.auto_creator.context.DatabaseContext;
 import studio.geonlee.auto_creator.frame.MainFrame;
@@ -54,12 +54,11 @@ public class DatabaseConnectionDialog extends JDialog {
             userField.setText(loaded.getUser());
             passwordField.setText(loaded.getPassword());
         }
-
-        setVisible(true);
     }
 
     private JPanel createFormPanel() {
         JPanel panel = new JPanel(new GridLayout(7, 2, 10, 8));
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20)); // ✅ 여기에 padding 추가!
 
         panel.add(new JLabel("Database Type:"));
         panel.add(databaseTypeCombo);
@@ -116,9 +115,9 @@ public class DatabaseConnectionDialog extends JDialog {
                 databaseCombo.addItem(rs.getString("datname"));
             }
 
-            mainFrame.log("✅ 데이터베이스 목록 로드 완료");
+            MainFrame.log("✅ 데이터베이스 목록 로드 완료");
         } catch (Exception ex) {
-            mainFrame.log("❌ DB 목록 로드 실패: " + ex.getMessage());
+            MainFrame.log("❌ DB 목록 로드 실패: " + ex.getMessage());
             JOptionPane.showMessageDialog(this, "DB 목록 조회 실패\n" + ex.getMessage(), "오류", JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -138,7 +137,7 @@ public class DatabaseConnectionDialog extends JDialog {
 
             connection = DriverManager.getConnection(url, userField.getText(), new String(passwordField.getPassword()));
             mainFrame.setDatabaseConnection(connection, selectedDatabase);
-            mainFrame.log("✅ 데이터베이스 연결 성공: " + selectedDatabase);
+            MainFrame.log("✅ 데이터베이스 연결 성공: " + selectedDatabase);
             dispose();
             DatabaseConfigFileHandler.save(new DatabaseConfig(
                     databaseType.name(),
@@ -149,8 +148,53 @@ public class DatabaseConnectionDialog extends JDialog {
                     selectedDatabase
             ));
         } catch (Exception ex) {
-            mainFrame.log("❌ 연결 실패: " + ex.getMessage());
+            MainFrame.log("❌ 연결 실패: " + ex.getMessage());
             JOptionPane.showMessageDialog(this, "데이터베이스 연결 실패\n" + ex.getMessage(), "오류", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    public void loadDatabaseListAndSelect(String databaseName) {
+        try {
+            DatabaseType databaseType = (DatabaseType) databaseTypeCombo.getSelectedItem();
+            String url = databaseType.formatUrl(hostField.getText(), Integer.parseInt(portField.getText()));
+
+            // 기본 접속 DB
+            if (databaseType == DatabaseType.POSTGRESQL) {
+                url += "postgres";
+            } else {
+                MainFrame.log("⚠️ 현재 " + databaseType + "는 DB 목록 조회 미지원");
+                return;
+            }
+
+            Connection tempConnection = DriverManager.getConnection(url, userField.getText(), new String(passwordField.getPassword()));
+            ResultSet rs = tempConnection.createStatement().executeQuery("SELECT datname FROM pg_database WHERE datistemplate = false");
+
+            databaseCombo.removeAllItems();
+            while (rs.next()) {
+                databaseCombo.addItem(rs.getString("datname"));
+            }
+
+            databaseCombo.setSelectedItem(databaseName); // ✅ 여기서 복원
+            MainFrame.log("✅ 데이터베이스 목록 로드 및 복원 완료");
+
+            rs.close();
+            tempConnection.close(); // 🔥 접속 끝나면 닫아야 한다
+
+        } catch (Exception ex) {
+            MainFrame.log("❌ 데이터베이스 목록 로딩 실패: " + ex.getMessage());
+        }
+    }
+
+    public void setDatabaseConfig(DatabaseConfig config) {
+        if (config == null) return;
+
+        databaseTypeCombo.setSelectedItem(DatabaseType.valueOf(config.getDatabaseType()));
+        hostField.setText(config.getHost());
+        portField.setText(String.valueOf(config.getPort()));
+        userField.setText(config.getUser());
+        passwordField.setText(config.getPassword());
+        databaseCombo.removeAllItems();
+        databaseCombo.addItem(config.getDatabaseName());
+        databaseCombo.setSelectedItem(config.getDatabaseName());
     }
 }

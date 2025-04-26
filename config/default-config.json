@@ -1,0 +1,9 @@
+{
+  "defaultPackageName" : "studio.geonlee",
+  "entityBasePackage" : "studio.geonlee.entity",
+  "recordBasePackage" : "studio.geonlee.domain",
+  "defaultSavePath" : "C:/Users/GEON/Desktop",
+  "theme" : "FlatDarculaLaf",
+  "autoLoadDatabaseOnStart" : true,
+  "useSwagger" : true
+}

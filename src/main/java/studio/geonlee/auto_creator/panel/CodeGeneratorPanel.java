@@ -70,7 +70,7 @@ public class CodeGeneratorPanel extends JPanel {
             previewArea.setText(code);
 
             currentCodeType = CodeType.ENTITY;
-            mainFrame.log("✅ Entity 생성 완료: " + className + " (테이블: " + schema + "." + tableName + ")");
+            MainFrame.log("✅ Entity 생성 완료: " + className + " (테이블: " + schema + "." + tableName + ")");
         });
 
 
@@ -98,7 +98,7 @@ public class CodeGeneratorPanel extends JPanel {
                     case "search" -> CodeType.RECORD_SEARCH;
                     default -> null;
                 };
-                mainFrame.log("✅ Record (" + type + ") 생성 완료");
+                MainFrame.log("✅ Record (" + type + ") 생성 완료");
             });
             recordMenu.add(item);
         }
@@ -127,9 +127,9 @@ public class CodeGeneratorPanel extends JPanel {
             if (result == JFileChooser.APPROVE_OPTION) {
                 try (FileWriter writer = new FileWriter(chooser.getSelectedFile())) {
                     writer.write(defaultName);
-                    mainFrame.log("📁 저장 완료: " + chooser.getSelectedFile().getAbsolutePath());
+                    MainFrame.log("📁 저장 완료: " + chooser.getSelectedFile().getAbsolutePath());
                 } catch (IOException ex) {
-                    mainFrame.log("❌ 파일 저장 실패: " + ex.getMessage());
+                    MainFrame.log("❌ 파일 저장 실패: " + ex.getMessage());
                     JOptionPane.showMessageDialog(this, "파일 저장 중 오류 발생\n" + ex.getMessage(), "오류", JOptionPane.ERROR_MESSAGE);
                 }
             }
@@ -147,7 +147,7 @@ public class CodeGeneratorPanel extends JPanel {
                     .getSystemClipboard()
                     .setContents(new java.awt.datatransfer.StringSelection(code), null);
 
-            mainFrame.log("📋 코드 전체 복사됨");
+            MainFrame.log("📋 코드 전체 복사됨");
         });
     }
 

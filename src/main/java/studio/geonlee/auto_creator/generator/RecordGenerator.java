@@ -2,6 +2,8 @@ package studio.geonlee.auto_creator.generator;
 
 import studio.geonlee.auto_creator.common.enumeration.DatabaseType;
 import studio.geonlee.auto_creator.common.record.FieldMetadata;
+import studio.geonlee.auto_creator.config.DefaultConfigFileHandler;
+import studio.geonlee.auto_creator.config.dto.DefaultConfig;
 import studio.geonlee.auto_creator.context.DatabaseContext;
 
 import java.sql.Connection;
@@ -16,7 +18,7 @@ import static studio.geonlee.auto_creator.generator.EntityCodeGenerator.extractF
 public class RecordGenerator {
 
     public static String generate(
-            String mode, // "Create", "Update", ...
+            String mode, // "Create", "Update", "Delete", "Search"
             String baseClassName,
             String tableName,
             String schema,
@@ -28,7 +30,7 @@ public class RecordGenerator {
 
             String recordName = baseClassName + mode + "Record";
 
-            List<FieldMetadata> selected = switch (mode.toLowerCase()) {
+            List<FieldMetadata> selectedFields = switch (mode.toLowerCase()) {
                 case "create" -> fields.stream()
                         .filter(f -> !f.primaryKey())
                         .toList();
@@ -39,43 +41,80 @@ public class RecordGenerator {
                 default -> throw new IllegalArgumentException("Unknown mode: " + mode);
             };
 
-            StringBuilder sb = new StringBuilder();
-            sb.append("package studio.geonlee.record;\n\n");
-            boolean hasValidation = selected.stream()
-                    .anyMatch(f -> !f.nullable() || (f.javaType().equals("String") && f.length() > 0));
+            DefaultConfig config = DefaultConfigFileHandler.load();
+            boolean useSwagger = config.isUseSwagger();
 
-            if (hasValidation) {
+            String basePackage = config.getRecordBasePackage();
+            String recordPackage = basePackage + "." + tableName.toLowerCase() + ".record";
+
+            StringBuilder sb = new StringBuilder();
+            sb.append("package ").append(recordPackage).append(";").append("\n\n");
+
+            boolean needsValidation = selectedFields.stream()
+                    .anyMatch(f -> !f.nullable() || ("String".equals(f.javaType()) && f.length() > 0));
+
+            if (needsValidation) {
                 sb.append("import jakarta.validation.constraints.*;\n\n");
+            }
+
+            if (useSwagger) {
+                sb.append("import io.swagger.v3.oas.annotations.media.Schema;\n\n");
+            }
+
+            if (useSwagger) {
+                sb.append("@Schema(description = \"")
+                        .append(tableName).append(" ").append(mode).append(" Record\")\n");
             }
 
             sb.append("public record ").append(recordName).append("(\n");
 
-            for (int i = 0; i < selected.size(); i++) {
-                FieldMetadata f = selected.get(i);
+            for (int i = 0; i < selectedFields.size(); i++) {
+                FieldMetadata field = selectedFields.get(i);
 
-                if (f.comment() != null && !f.comment().isBlank()) {
-                    sb.append("    /** ").append(f.comment()).append(" */\n");
+                if (!useSwagger && field.comment() != null) {
+                    sb.append("    /** ").append(field.comment()).append(" */\n");
                 }
-
-                // Validation 추가
-                if (!f.nullable()) {
+                if (!field.nullable()) {
                     sb.append("    @NotNull\n");
                 }
-                if (f.javaType().equals("String") && f.length() > 0) {
-                    sb.append("    @Size(max = ").append(f.length()).append(")\n");
+                if ("String".equals(field.javaType()) && field.length() > 0) {
+                    sb.append("    @Size(max = ").append(field.length()).append(")\n");
+                }
+                if (useSwagger) {
+                    sb.append("    @Schema(description = \"")
+                            .append(field.comment() != null ? field.comment() : field.columnName())
+                            .append("\", example = \"")
+                            .append(generateExample(field.javaType()))
+                            .append("\")\n");
                 }
 
-                sb.append("    ").append(f.javaType()).append(" ").append(f.fieldName());
-                sb.append(i < selected.size() - 1 ? ",\n\n" : "\n");
+                sb.append("    ").append(field.javaType()).append(" ").append(field.fieldName());
+                sb.append(i < selectedFields.size() - 1 ? ",\n\n" : "\n");
             }
 
             sb.append(") {}\n");
             return sb.toString();
 
         } catch (Exception e) {
-            return "// ❌ Record 생성 실패: " + e.getMessage();
+            throw new RuntimeException("❌ Record 생성 실패", e);
         }
     }
 
-    // extractFieldMetadata()는 EntityGenerator와 동일한 방식
+    private static String generateExample(String fieldType) {
+        fieldType = fieldType.toLowerCase();
+        if (fieldType.contains("string")) {
+            return "sample text";
+        } else if (fieldType.contains("int") || fieldType.contains("long")) {
+            return "1";
+        } else if (fieldType.contains("boolean")) {
+            return "true";
+        } else if (fieldType.contains("date") && !fieldType.contains("time")) {
+            return "2024-01-01";
+        } else if (fieldType.contains("time")) {
+            return "2024-01-01 12:00:00";
+        } else if (fieldType.contains("bigdecimal") || fieldType.contains("double") || fieldType.contains("float")) {
+            return "12345.67";
+        }
+        return "sample";
+    }
 }

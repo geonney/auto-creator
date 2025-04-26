@@ -1,4 +1,4 @@
-package studio.geonlee.auto_creator.config;
+package studio.geonlee.auto_creator.config.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
