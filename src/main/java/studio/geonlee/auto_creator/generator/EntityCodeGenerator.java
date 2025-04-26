@@ -41,7 +41,7 @@ public class EntityCodeGenerator {
                 sb.append("import java.math.BigDecimal;\n");
             }
 
-            sb.append("@Getter\n@Setter\n@Entity\n");
+            sb.append("@Getter\n@Entity\n");
             sb.append("@Table(name = \"").append(tableName).append("\")\n");
             sb.append("public class ").append(className).append(" {\n\n");
 
@@ -113,7 +113,7 @@ public class EntityCodeGenerator {
     private static String generateEmbeddedId(String className, List<FieldMetadata> pkFields) {
         StringBuilder sb = new StringBuilder();
 
-        sb.append("@Getter\n@Setter\n@EqualsAndHashCode\n@Embeddable\n");
+        sb.append("@Getter\n@EqualsAndHashCode\n@Embeddable\n");
         sb.append("public class ").append(className).append(" {\n\n");
 
         for (FieldMetadata field : pkFields) {
