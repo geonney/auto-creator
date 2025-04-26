@@ -1,8 +1,9 @@
 package studio.geonlee.auto_creator.dialog;
 
 import studio.geonlee.auto_creator.common.enumeration.DatabaseType;
-import studio.geonlee.auto_creator.config.dto.DatabaseConfig;
 import studio.geonlee.auto_creator.config.DatabaseConfigFileHandler;
+import studio.geonlee.auto_creator.config.dto.DatabaseConfig;
+import studio.geonlee.auto_creator.config.message.MessageUtil;
 import studio.geonlee.auto_creator.context.DatabaseContext;
 import studio.geonlee.auto_creator.frame.MainFrame;
 
@@ -11,6 +12,7 @@ import java.awt.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.util.Objects;
 
 /**
  * @author GEON
@@ -28,7 +30,7 @@ public class DatabaseConnectionDialog extends JDialog {
     private Connection connection;
 
     public DatabaseConnectionDialog(MainFrame mainFrame) {
-        super(mainFrame, "데이터베이스 연결", true);
+        super(mainFrame, MessageUtil.get("title.database.connection"), true);
         this.mainFrame = mainFrame;
 
         setLayout(new BorderLayout());
@@ -75,17 +77,17 @@ public class DatabaseConnectionDialog extends JDialog {
         panel.add(new JLabel("Password:"));
         panel.add(passwordField);
 
-        panel.add(new JLabel("Database Name:"));
+        panel.add(new JLabel("Database List:"));
         panel.add(databaseCombo);
 
         return panel;
     }
 
     private JPanel createButtonPanel() {
-        JButton loadBtn = new JButton("데이터베이스 목록 불러오기");
+        JButton loadBtn = new JButton(MessageUtil.get("button.load.database.list"));
         loadBtn.addActionListener(e -> loadDatabaseList());
 
-        JButton connectBtn = new JButton("연결");
+        JButton connectBtn = new JButton(MessageUtil.get("button.connection"));
         connectBtn.addActionListener(e -> connectToDatabase());
 
         JPanel panel = new JPanel();
@@ -97,13 +99,15 @@ public class DatabaseConnectionDialog extends JDialog {
     private void loadDatabaseList() {
         try {
             DatabaseType databaseType = (DatabaseType) databaseTypeCombo.getSelectedItem();
-            String url = databaseType.formatUrl(hostField.getText(), Integer.parseInt(portField.getText()));
+            String url = Objects.requireNonNull(databaseType).formatUrl(hostField.getText(), Integer.parseInt(portField.getText()));
 
             // TODO 타 DB 관련 처리 필요. 현재 postgresql 만 가능.
             if (databaseType == DatabaseType.POSTGRESQL) {
                 url += "postgres";
             } else {
-                JOptionPane.showMessageDialog(this, databaseType + "의 DB 목록 조회는 아직 지원되지 않습니다.", "알림", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this,
+                        "⚠️ " + databaseType + MessageUtil.get("not.supported.database"),
+                        "Warning", JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
@@ -115,29 +119,27 @@ public class DatabaseConnectionDialog extends JDialog {
                 databaseCombo.addItem(rs.getString("datname"));
             }
 
-            MainFrame.log("✅ 데이터베이스 목록 로드 완료");
+            MainFrame.log(MessageUtil.get("database.list.load.success"));
         } catch (Exception ex) {
-            MainFrame.log("❌ DB 목록 로드 실패: " + ex.getMessage());
-            JOptionPane.showMessageDialog(this, "DB 목록 조회 실패\n" + ex.getMessage(), "오류", JOptionPane.ERROR_MESSAGE);
+            MainFrame.log(MessageUtil.get("database.list.load.failure") + ": " + ex.getMessage());
+            JOptionPane.showMessageDialog(this,
+                    MessageUtil.get("database.list.load.failure") + ".\n" + ex.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private void connectToDatabase() {
         String selectedDatabase = (String) databaseCombo.getSelectedItem();
-        if (selectedDatabase == null || selectedDatabase.isBlank()) {
-            JOptionPane.showMessageDialog(this, "데이터베이스를 선택하세요.", "오류", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
 
         try {
             DatabaseType databaseType = (DatabaseType) databaseTypeCombo.getSelectedItem();
             DatabaseContext.setDatabaseType(databaseType);
 
-            String url = databaseType.formatUrl(hostField.getText(), Integer.parseInt(portField.getText())) + selectedDatabase;
+            String url = Objects.requireNonNull(databaseType).formatUrl(hostField.getText(), Integer.parseInt(portField.getText())) + selectedDatabase;
 
             connection = DriverManager.getConnection(url, userField.getText(), new String(passwordField.getPassword()));
             mainFrame.setDatabaseConnection(connection, selectedDatabase);
-            MainFrame.log("✅ 데이터베이스 연결 성공: " + selectedDatabase);
+            MainFrame.log(MessageUtil.get("database.connection.success") + ": " + selectedDatabase);
             dispose();
             DatabaseConfigFileHandler.save(new DatabaseConfig(
                     databaseType.name(),
@@ -148,21 +150,23 @@ public class DatabaseConnectionDialog extends JDialog {
                     selectedDatabase
             ));
         } catch (Exception ex) {
-            MainFrame.log("❌ 연결 실패: " + ex.getMessage());
-            JOptionPane.showMessageDialog(this, "데이터베이스 연결 실패\n" + ex.getMessage(), "오류", JOptionPane.ERROR_MESSAGE);
+            MainFrame.log(MessageUtil.get("database.connection.failure") + ": " + ex.getMessage());
+            JOptionPane.showMessageDialog(this,
+                    MessageUtil.get("database.connection.failure") + ".\n" + ex.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     public void loadDatabaseListAndSelect(String databaseName) {
         try {
             DatabaseType databaseType = (DatabaseType) databaseTypeCombo.getSelectedItem();
-            String url = databaseType.formatUrl(hostField.getText(), Integer.parseInt(portField.getText()));
+            String url = Objects.requireNonNull(databaseType).formatUrl(hostField.getText(), Integer.parseInt(portField.getText()));
 
             // 기본 접속 DB
             if (databaseType == DatabaseType.POSTGRESQL) {
                 url += "postgres";
             } else {
-                MainFrame.log("⚠️ 현재 " + databaseType + "는 DB 목록 조회 미지원");
+                MainFrame.log("⚠️ " + databaseType + MessageUtil.get("not.supported.database"));
                 return;
             }
 
@@ -175,13 +179,13 @@ public class DatabaseConnectionDialog extends JDialog {
             }
 
             databaseCombo.setSelectedItem(databaseName); // ✅ 여기서 복원
-            MainFrame.log("✅ 데이터베이스 목록 로드 및 복원 완료");
+            MainFrame.log(MessageUtil.get("database.list.load.success"));
 
             rs.close();
             tempConnection.close(); // 🔥 접속 끝나면 닫아야 한다
 
         } catch (Exception ex) {
-            MainFrame.log("❌ 데이터베이스 목록 로딩 실패: " + ex.getMessage());
+            MainFrame.log(MessageUtil.get("database.list.load.failure") + ": " + ex.getMessage());
         }
     }
 

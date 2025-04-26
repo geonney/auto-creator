@@ -5,7 +5,9 @@ import studio.geonlee.auto_creator.config.DatabaseConfigFileHandler;
 import studio.geonlee.auto_creator.config.DefaultConfigFileHandler;
 import studio.geonlee.auto_creator.config.dto.DatabaseConfig;
 import studio.geonlee.auto_creator.config.dto.DefaultConfig;
+import studio.geonlee.auto_creator.config.message.MessageUtil;
 import studio.geonlee.auto_creator.context.DatabaseContext;
+import studio.geonlee.auto_creator.dialog.AboutDialog;
 import studio.geonlee.auto_creator.dialog.DatabaseConnectionDialog;
 import studio.geonlee.auto_creator.dialog.SettingsDialog;
 import studio.geonlee.auto_creator.panel.CodeGeneratorPanel;
@@ -23,10 +25,6 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author GEON
@@ -35,19 +33,16 @@ import java.util.Map;
 public class MainFrame extends JFrame {
     private static MainFrame instance;
     private final JTextArea logArea = new JTextArea();
-    private final Map<String, JPanel> panelMap = new HashMap<>();
     private final DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode("No database");
     private final JTree tableTree = new JTree(rootNode);
     private final CodeGeneratorPanel codeGeneratorPanel = new CodeGeneratorPanel(this);
-    private DatabaseConnectionDialog databaseConnectionDialog;
+    private final DatabaseConnectionDialog databaseConnectionDialog;
     private String selectedTableName;
     private String selectedSchemaName;
-    private String savedDatabaseName;
-    private final List<String> savedDatabaseList = new ArrayList<>();
 
     public MainFrame() {
         instance = this;
-        setTitle("🔧 코드 자동 생성기");
+        setTitle("🔧 Auto Code");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         try {
@@ -57,7 +52,7 @@ public class MainFrame extends JFrame {
                 setIconImage(icon);
             }
         } catch (IOException e) {
-            System.err.println("아이콘 설정 실패: " + e.getMessage());
+            System.err.println("Icon setting Failure: " + e.getMessage());
         }
 
         setSize(1000, 700);
@@ -88,7 +83,7 @@ public class MainFrame extends JFrame {
                 selectedSchemaName = schemaNode.getUserObject().toString().replace("📁 ", "").trim();
 
                 codeGeneratorPanel.setClassNameFromTable(selectedTableName);
-                log("📌 테이블 선택: " + selectedSchemaName + "." + selectedTableName);
+                log(MessageUtil.get("main.chosen.table") + ": " + selectedSchemaName + "." + selectedTableName);
             } else {
                 selectedTableName = null;
                 selectedSchemaName = null;
@@ -99,7 +94,7 @@ public class MainFrame extends JFrame {
         add(splitPane, BorderLayout.CENTER);
         add(new JScrollPane(logArea), BorderLayout.SOUTH);
 
-        log("✅ 프로그램 시작됨");
+        log(MessageUtil.get("main.initial.success"));
         setVisible(true);
 
         // TODO 이전에 저장한 DB 정보를 자동 매핑하기 위해 설정
@@ -111,21 +106,17 @@ public class MainFrame extends JFrame {
         JMenuBar menuBar = new JMenuBar();
 
         // File Menu
-        JMenu fileMenu = new JMenu("File");
+        JMenu fileMenu = new JMenu(MessageUtil.get("menu.file"));
 
-        JMenuItem databaseConnectionItem = new JMenuItem("Database Connection");
-        JMenuItem settingsItem = new JMenuItem("Settings");
-
-        // TODO 단축키 설정
-        databaseConnectionItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK));
-        settingsItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
+        JMenuItem databaseConnectionItem = new JMenuItem(MessageUtil.get("menu.file.database.connection"));
+        JMenuItem settingsItem = new JMenuItem(MessageUtil.get("menu.settings"));
 
         fileMenu.add(databaseConnectionItem);
         fileMenu.add(settingsItem);
 
         // Help Menu
-        JMenu helpMenu = new JMenu("Help");
-        JMenuItem aboutItem = new JMenuItem("About");
+        JMenu helpMenu = new JMenu(MessageUtil.get("menu.help"));
+        JMenuItem aboutItem = new JMenuItem(MessageUtil.get("menu.help.about"));
 
         helpMenu.add(aboutItem);
 
@@ -134,10 +125,15 @@ public class MainFrame extends JFrame {
         menuBar.add(helpMenu);
         setJMenuBar(menuBar);
 
+        // TODO 단축키 설정
+        databaseConnectionItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK));
+        settingsItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
+        aboutItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
+
         // Menu event registration
         databaseConnectionItem.addActionListener(e -> databaseConnectionDialog.setVisible(true));
         settingsItem.addActionListener(e -> new SettingsDialog(this).setVisible(true));
-//        aboutItem.addActionListener(e -> showAboutDialog());
+        aboutItem.addActionListener(e -> new AboutDialog(this).setVisible(true));
     }
 
     private void setupLogArea() {
@@ -190,9 +186,9 @@ public class MainFrame extends JFrame {
 
             ((DefaultTreeModel) tableTree.getModel()).reload();
             tableTree.expandRow(0);
-            MainFrame.log("✅ 테이블 트리 로딩 완료");
+            MainFrame.log(MessageUtil.get("table.load.success"));
         } catch (Exception ex) {
-            MainFrame.log("❌ 테이블 트리 로딩 실패: " + ex.getMessage());
+            MainFrame.log(MessageUtil.get("table.load.failure") + ": " + ex.getMessage());
         }
     }
 
@@ -218,8 +214,6 @@ public class MainFrame extends JFrame {
                     DatabaseContext.setDatabaseType(dbType);
                     DatabaseContext.setDatabaseName(dbConfig.getDatabaseName());
 
-                    MainFrame.log("✅ 마지막 데이터베이스 연결 복원 성공: " + dbConfig.getDatabaseName());
-
                     // ✅ 연결 성공했으면
                     if (databaseConnectionDialog != null) {
                         databaseConnectionDialog.setDatabaseConfig(dbConfig);
@@ -227,12 +221,13 @@ public class MainFrame extends JFrame {
                     }
 
                     refreshTableTree(); // ✅ 트리 다시 그리기
+                    MainFrame.log(MessageUtil.get("last.setting.load.success") + ": " + dbConfig.getDatabaseName());
                 } else {
-                    MainFrame.log("ℹ️ 저장된 DatabaseConfig 정보가 없습니다.");
+                    MainFrame.log(MessageUtil.get("no.database.setting"));
                 }
             }
         } catch (Exception e) {
-            MainFrame.log("❌ 마지막 데이터베이스 연결 복원 실패: " + e.getMessage());
+            MainFrame.log(MessageUtil.get("last.setting.load.failure") + ": " + e.getMessage());
         }
     }
 }

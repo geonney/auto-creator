@@ -19,7 +19,7 @@ public class DatabaseConfigFileHandler {
             FILE.getParentFile().mkdirs(); // config/ 디렉토리 생성
             mapper.writerWithDefaultPrettyPrinter().writeValue(FILE, config);
         } catch (Exception e) {
-            MainFrame.log("❌ [database-config.json] ⚠️ 설정 저장 실패: " + e.getMessage());
+            MainFrame.log("❌ [database-config.json] ⚠️ Setting Save Failure: " + e.getMessage());
         }
     }
 
@@ -29,7 +29,7 @@ public class DatabaseConfigFileHandler {
                 return mapper.readValue(FILE, DatabaseConfig.class);
             }
         } catch (Exception e) {
-            MainFrame.log("❌ [database-config.json] ⚠️ 설정 로딩 실패: " + e.getMessage());
+            MainFrame.log("❌ [database-config.json] ⚠️ Setting Save Failure: " + e.getMessage());
         }
         return null;
     }

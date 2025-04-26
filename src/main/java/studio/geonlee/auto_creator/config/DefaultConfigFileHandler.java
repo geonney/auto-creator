@@ -26,7 +26,7 @@ public class DefaultConfigFileHandler {
                 return config;
             }
         } catch (IOException e) {
-            MainFrame.log("❌ [default-config.json] 로딩 실패: " + e.getMessage());
+            MainFrame.log("❌ [default-config.json] Loading Failure: " + e.getMessage());
             return new DefaultConfig();
         }
     }
@@ -36,7 +36,7 @@ public class DefaultConfigFileHandler {
         try {
             mapper.writerWithDefaultPrettyPrinter().writeValue(new File(CONFIG_FILE), config);
         } catch (IOException e) {
-            MainFrame.log("❌ [default-config.json] 저장 실패: " + e.getMessage());
+            MainFrame.log("❌ [default-config.json] Save Failure: " + e.getMessage());
         }
     }
 }

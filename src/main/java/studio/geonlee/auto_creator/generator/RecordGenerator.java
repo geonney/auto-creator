@@ -5,6 +5,7 @@ import studio.geonlee.auto_creator.common.record.FieldMetadata;
 import studio.geonlee.auto_creator.config.DefaultConfigFileHandler;
 import studio.geonlee.auto_creator.config.dto.DefaultConfig;
 import studio.geonlee.auto_creator.context.DatabaseContext;
+import studio.geonlee.auto_creator.frame.MainFrame;
 
 import java.sql.Connection;
 import java.util.List;
@@ -96,6 +97,7 @@ public class RecordGenerator {
             return sb.toString();
 
         } catch (Exception e) {
+            MainFrame.log("❌ Record 생성 실패");
             throw new RuntimeException("❌ Record 생성 실패", e);
         }
     }

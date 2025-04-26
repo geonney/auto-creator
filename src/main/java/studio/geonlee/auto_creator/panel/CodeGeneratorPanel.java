@@ -2,6 +2,7 @@ package studio.geonlee.auto_creator.panel;
 
 import studio.geonlee.auto_creator.common.enumeration.CodeType;
 import studio.geonlee.auto_creator.common.enumeration.DatabaseType;
+import studio.geonlee.auto_creator.config.message.MessageUtil;
 import studio.geonlee.auto_creator.context.DatabaseContext;
 import studio.geonlee.auto_creator.frame.MainFrame;
 import studio.geonlee.auto_creator.generator.EntityCodeGenerator;
@@ -27,11 +28,11 @@ public class CodeGeneratorPanel extends JPanel {
 
         // ✅ 상단 버튼 패널
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        topPanel.add(new JLabel("Entity 이름:"));
+        topPanel.add(new JLabel(MessageUtil.get("title.entity.name") + ":"));
         topPanel.add(classNameField);
-        JButton entityCreateButton = new JButton("Entity 생성");
+        JButton entityCreateButton = new JButton(MessageUtil.get("button.create.entity"));
         topPanel.add(entityCreateButton);
-        JButton recordBtn = new JButton("Record 생성");
+        JButton recordBtn = new JButton(MessageUtil.get("button.create.record"));
         topPanel.add(recordBtn);
         add(topPanel, BorderLayout.NORTH);
 
@@ -43,26 +44,26 @@ public class CodeGeneratorPanel extends JPanel {
 
         // ✅ 하단 저장 버튼 패널
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton copyButton = new JButton("📋 복사");
-        JButton downloadButton = new JButton("💾 저장");
+        JButton copyButton = new JButton(MessageUtil.get("button.copy"));
+        JButton downloadButton = new JButton(MessageUtil.get("button.download"));
         bottomPanel.add(copyButton);
         bottomPanel.add(downloadButton);
         add(bottomPanel, BorderLayout.SOUTH);
 
         // ✅ Entity 생성 버튼 로직
         entityCreateButton.addActionListener(e -> {
-            String className = classNameField.getText().trim();
-            if (className.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "클래스 이름을 입력하세요.", "입력 필요", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-
             String tableName = mainFrame.getSelectedTable();
             String schema = mainFrame.getSelectedSchema();
             DatabaseType dbType = DatabaseContext.getDatabaseType();
 
             if (tableName == null || schema == null) {
-                JOptionPane.showMessageDialog(this, "테이블을 먼저 선택하세요.", "경고", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, MessageUtil.get("choose.table.first"), "Warning", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            String className = classNameField.getText().trim();
+            if (className.isEmpty()) {
+                JOptionPane.showMessageDialog(this, MessageUtil.get("enter.entity.name"), "Warning", JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
@@ -70,7 +71,7 @@ public class CodeGeneratorPanel extends JPanel {
             previewArea.setText(code);
 
             currentCodeType = CodeType.ENTITY;
-            MainFrame.log("✅ Entity 생성 완료: " + className + " (테이블: " + schema + "." + tableName + ")");
+            MainFrame.log(MessageUtil.get("entity.create.success") + ": " + className + " (Table: " + schema + "." + tableName + ")");
         });
 
 
@@ -98,17 +99,32 @@ public class CodeGeneratorPanel extends JPanel {
                     case "search" -> CodeType.RECORD_SEARCH;
                     default -> null;
                 };
-                MainFrame.log("✅ Record (" + type + ") 생성 완료");
+                MainFrame.log(MessageUtil.get("record.create.success") + ": " + className + " (" + type + ")");
             });
             recordMenu.add(item);
         }
 
         recordBtn.addActionListener(e -> {
+            String tableName = mainFrame.getSelectedTable();
+            if (tableName == null) {
+                JOptionPane.showMessageDialog(this,
+                        MessageUtil.get("choose.table.first"),
+                        "Warning", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
             recordMenu.show(recordBtn, 0, recordBtn.getHeight());
         });
 
         // ✅ 저장(download) 버튼 로직
         downloadButton.addActionListener(e -> {
+            String code = previewArea.getText().trim();
+            if (code.isEmpty()) {
+                JOptionPane.showMessageDialog(this,
+                        MessageUtil.get("no.code.download"),
+                        "Warning", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
             String defaultName = switch (currentCodeType) {
                 case RECORD_CREATE -> classNameField.getText().trim() + "CreateRecord.java";
                 case RECORD_UPDATE -> classNameField.getText().trim() + "UpdateRecord.java";
@@ -116,7 +132,7 @@ public class CodeGeneratorPanel extends JPanel {
                 case RECORD_SEARCH -> classNameField.getText().trim() + "SearchRecord.java";
                 default -> classNameField.getText().trim() + ".java";
             };
-            String fileName = JOptionPane.showInputDialog(this, "파일명을 입력하세요:", defaultName);
+            String fileName = JOptionPane.showInputDialog(this, MessageUtil.get("save.file.name"), defaultName);
 
             if (fileName == null || fileName.isBlank()) return;
 
@@ -127,10 +143,12 @@ public class CodeGeneratorPanel extends JPanel {
             if (result == JFileChooser.APPROVE_OPTION) {
                 try (FileWriter writer = new FileWriter(chooser.getSelectedFile())) {
                     writer.write(defaultName);
-                    MainFrame.log("📁 저장 완료: " + chooser.getSelectedFile().getAbsolutePath());
+                    MainFrame.log(MessageUtil.get("file.save.success") + ": " + chooser.getSelectedFile().getAbsolutePath());
                 } catch (IOException ex) {
-                    MainFrame.log("❌ 파일 저장 실패: " + ex.getMessage());
-                    JOptionPane.showMessageDialog(this, "파일 저장 중 오류 발생\n" + ex.getMessage(), "오류", JOptionPane.ERROR_MESSAGE);
+                    MainFrame.log(MessageUtil.get("file.save.failure") + ": " + ex.getMessage());
+                    JOptionPane.showMessageDialog(this,
+                            MessageUtil.get("file.save.failure") + ".\n" + ex.getMessage(),
+                            "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -139,7 +157,9 @@ public class CodeGeneratorPanel extends JPanel {
         copyButton.addActionListener(e -> {
             String code = previewArea.getText().trim();
             if (code.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "복사할 코드가 없습니다.", "알림", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this,
+                        MessageUtil.get("no.code.copy"),
+                        "Warning", JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
@@ -147,7 +167,7 @@ public class CodeGeneratorPanel extends JPanel {
                     .getSystemClipboard()
                     .setContents(new java.awt.datatransfer.StringSelection(code), null);
 
-            MainFrame.log("📋 코드 전체 복사됨");
+            MainFrame.log(MessageUtil.get("code.copy.success"));
         });
     }
 

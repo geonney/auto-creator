@@ -21,4 +21,5 @@ public class DefaultConfig {
     private String theme;
     private boolean autoLoadDatabaseOnStart;
     private boolean useSwagger;
+    private String language;
 }

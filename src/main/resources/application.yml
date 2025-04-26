@@ -7,3 +7,7 @@ spring:
     driver-class-name: org.postgresql.Driver
     username: test_user
     password: test!@34
+
+  messages:
+    basename: message/messages
+    encoding: UTF-8

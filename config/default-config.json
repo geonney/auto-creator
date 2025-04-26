@@ -5,5 +5,6 @@
   "defaultSavePath" : "C:/Users/GEON/Desktop",
   "theme" : "FlatDarculaLaf",
   "autoLoadDatabaseOnStart" : true,
-  "useSwagger" : true
+  "useSwagger" : true,
+  "language" : "ko"
 }
