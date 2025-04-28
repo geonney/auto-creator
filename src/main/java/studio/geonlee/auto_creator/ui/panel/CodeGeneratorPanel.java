@@ -10,15 +10,12 @@ import studio.geonlee.auto_creator.config.DefaultConfigFileHandler;
 import studio.geonlee.auto_creator.config.dto.DefaultConfig;
 import studio.geonlee.auto_creator.config.message.MessageUtil;
 import studio.geonlee.auto_creator.context.DatabaseContext;
-import studio.geonlee.auto_creator.generator.MapperGenerator;
-import studio.geonlee.auto_creator.generator.QueryGenerator;
+import studio.geonlee.auto_creator.generator.*;
 import studio.geonlee.auto_creator.generator.layered.ControllerGenerator;
 import studio.geonlee.auto_creator.generator.layered.RepositoryGenerator;
 import studio.geonlee.auto_creator.generator.layered.ServiceImplGenerator;
 import studio.geonlee.auto_creator.generator.layered.ServiceInterfaceGenerator;
 import studio.geonlee.auto_creator.ui.frame.MainFrame;
-import studio.geonlee.auto_creator.generator.EntityCodeGenerator;
-import studio.geonlee.auto_creator.generator.RecordGenerator;
 
 import javax.swing.*;
 import java.awt.*;
@@ -259,6 +256,7 @@ public class CodeGeneratorPanel extends JPanel {
             case "Service Impl" -> ServiceImplGenerator.generate(entityMeta);
             case "Repository" -> RepositoryGenerator.generate(entityMeta);
             case "Mapper" -> MapperGenerator.generate(entityMeta);
+            case "Query xml" -> MybatisXmlGenerator.generate(entityMeta);
             default -> "";
         };
 
@@ -270,6 +268,7 @@ public class CodeGeneratorPanel extends JPanel {
             case "Service Impl" -> CodeType.SERVICE_IMPL;
             case "Repository" -> CodeType.REPOSITORY;
             case "Mapper" -> CodeType.MAPPER;
+            case "Query xml" -> CodeType.XML;
             default -> null;
         };
 
@@ -292,6 +291,7 @@ public class CodeGeneratorPanel extends JPanel {
             serviceTypes.add("Repository");
         } else if (isMybatis) {
             serviceTypes.add("Mapper");
+            serviceTypes.add("Query xml");
         }
 
         for (String type : serviceTypes) {

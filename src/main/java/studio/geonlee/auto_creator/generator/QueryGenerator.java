@@ -9,6 +9,7 @@ import java.util.List;
 /**
  * @author GEON
  * @since 2025-04-28
+ * 추후 사용 할 수도?
  **/
 public class QueryGenerator {
 

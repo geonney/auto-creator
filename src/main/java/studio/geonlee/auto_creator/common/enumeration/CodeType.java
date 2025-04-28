@@ -15,5 +15,6 @@ public enum CodeType {
     SERVICE_INTERFACE,
     SERVICE_IMPL,
     REPOSITORY,
-    MAPPER
+    MAPPER,
+    XML
 }
