@@ -316,6 +316,12 @@ public class CodeGeneratorPanel extends JPanel {
             case RECORD_UPDATE -> classNameField.getText().trim() + "UpdateRecord.java";
             case RECORD_DELETE -> classNameField.getText().trim() + "DeleteRecord.java";
             case RECORD_SEARCH -> classNameField.getText().trim() + "SearchRecord.java";
+            case CONTROLLER -> classNameField.getText().trim() + "Controller.java";
+            case SERVICE_INTERFACE -> classNameField.getText().trim() + "Service.java";
+            case SERVICE_IMPL -> classNameField.getText().trim() + "ServiceImpl.java";
+            case REPOSITORY -> classNameField.getText().trim() + "Repository.java";
+            case MAPPER -> classNameField.getText().trim() + "Mapper.java";
+            case XML -> classNameField.getText().trim() + "Mapper.xml";
             default -> classNameField.getText().trim() + ".java";
         };
 
