@@ -1,11 +1,13 @@
 package studio.geonlee.auto_creator.common.record;
 
 import studio.geonlee.auto_creator.common.enumeration.DatabaseType;
+import studio.geonlee.auto_creator.common.util.CaseUtils;
 import studio.geonlee.auto_creator.common.util.EntityTypeMapper;
 
 /**
  * @author GEON
  * @since 2025-04-25
+ * column 단위 metadata
  **/
 public record FieldMetadata(
         String columnName,
@@ -29,7 +31,7 @@ public record FieldMetadata(
     ) {
         return new FieldMetadata(
                 columnName,
-                toCamelCase(columnName),
+                CaseUtils.toCamelCase(columnName),
                 EntityTypeMapper.map(dbType, dbTypeName),
                 isPrimaryKey,
                 nullable,
@@ -37,18 +39,5 @@ public record FieldMetadata(
                 columnDefault,
                 comment
         );
-    }
-
-    private static String toCamelCase(String name) {
-        if (name == null || name.isEmpty()) return name;
-        String[] parts = name.toLowerCase().split("_");
-        StringBuilder sb = new StringBuilder(parts[0]);
-
-        for (int i = 1; i < parts.length; i++) {
-            sb.append(Character.toUpperCase(parts[i].charAt(0)));
-            sb.append(parts[i].substring(1));
-        }
-
-        return sb.toString();
     }
 }

@@ -2,7 +2,7 @@ package studio.geonlee.auto_creator.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import studio.geonlee.auto_creator.config.dto.DatabaseConfig;
-import studio.geonlee.auto_creator.frame.MainFrame;
+import studio.geonlee.auto_creator.ui.frame.MainFrame;
 
 import java.io.File;
 

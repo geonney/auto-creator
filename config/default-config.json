@@ -1,10 +1,15 @@
 {
-  "defaultPackageName" : "studio.geonlee",
-  "entityBasePackage" : "studio.geonlee.entity",
-  "recordBasePackage" : "studio.geonlee.domain",
+  "entityBasePackage" : "com.aljjabaegi.api.entity",
+  "domainBasePackage" : "com.aljjabaegi.api.domain",
   "defaultSavePath" : "C:/Users/GEON/Desktop",
   "theme" : "FlatDarculaLaf",
   "autoLoadDatabaseOnStart" : true,
   "useSwagger" : true,
-  "language" : "ko"
+  "language" : "ko",
+  "architecture" : "layered",
+  "orm" : "jpa",
+  "windowX" : 433,
+  "windowY" : 238,
+  "windowWidth" : 1026,
+  "windowHeight" : 635
 }

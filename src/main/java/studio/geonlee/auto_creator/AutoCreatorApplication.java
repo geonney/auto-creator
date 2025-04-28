@@ -1,10 +1,7 @@
 package studio.geonlee.auto_creator;
 
 import com.formdev.flatlaf.FlatDarculaLaf;
-import com.formdev.flatlaf.FlatDarkLaf;
-import com.formdev.flatlaf.FlatIntelliJLaf;
-import com.formdev.flatlaf.FlatLightLaf;
-import studio.geonlee.auto_creator.frame.MainFrame;
+import studio.geonlee.auto_creator.ui.frame.MainFrame;
 
 import javax.swing.*;
 

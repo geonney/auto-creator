@@ -2,18 +2,11 @@ package studio.geonlee.auto_creator.generator;
 
 import studio.geonlee.auto_creator.common.enumeration.DatabaseType;
 import studio.geonlee.auto_creator.common.record.FieldMetadata;
+import studio.geonlee.auto_creator.common.util.DatabaseMetaReader;
 import studio.geonlee.auto_creator.config.DefaultConfigFileHandler;
 import studio.geonlee.auto_creator.config.dto.DefaultConfig;
-import studio.geonlee.auto_creator.context.DatabaseContext;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author GEON
@@ -23,8 +16,7 @@ public class EntityCodeGenerator {
 
     public static String generate(String className, String tableName, String schema, DatabaseType databaseType) {
         try {
-            Connection conn = DatabaseContext.getConnection();
-            List<FieldMetadata> fields = extractFieldMetadata(conn, schema, tableName, databaseType);
+            List<FieldMetadata> fields = DatabaseMetaReader.readTableFields(schema, tableName, databaseType);
 
             List<FieldMetadata> pkFields = fields.stream().filter(FieldMetadata::primaryKey).toList();
             List<FieldMetadata> nonPkFields = fields.stream().filter(f -> !f.primaryKey()).toList();
@@ -89,32 +81,32 @@ public class EntityCodeGenerator {
         }
     }
 
-    public static List<FieldMetadata> extractFieldMetadata(Connection conn, String schema, String tableName, DatabaseType dbType) throws SQLException {
-        List<FieldMetadata> list = new ArrayList<>();
-
-        Set<String> pkSet = new HashSet<>();
-        ResultSet pkRs = conn.getMetaData().getPrimaryKeys(null, schema, tableName);
-        while (pkRs.next()) {
-            pkSet.add(pkRs.getString("COLUMN_NAME"));
-        }
-
-        ResultSet rs = conn.getMetaData().getColumns(null, schema, tableName, null);
-        while (rs.next()) {
-            String columnName = rs.getString("COLUMN_NAME");
-            String typeName = rs.getString("TYPE_NAME");
-            boolean isPk = pkSet.contains(columnName);
-            boolean nullable = rs.getInt("NULLABLE") == DatabaseMetaData.columnNullable;
-            int length = rs.getInt("COLUMN_SIZE");
-            String columnDefault = rs.getString("COLUMN_DEF"); // 기본값
-            String remarks = rs.getString("REMARKS");          // 주석
-
-            list.add(FieldMetadata.of(
-                    dbType, columnName, typeName, isPk, nullable, length, columnDefault, remarks
-            ));
-        }
-
-        return list;
-    }
+//    public static List<FieldMetadata> extractFieldMetadata(Connection conn, String schema, String tableName, DatabaseType dbType) throws SQLException {
+//        List<FieldMetadata> list = new ArrayList<>();
+//
+//        Set<String> pkSet = new HashSet<>();
+//        ResultSet pkRs = conn.getMetaData().getPrimaryKeys(null, schema, tableName);
+//        while (pkRs.next()) {
+//            pkSet.add(pkRs.getString("COLUMN_NAME"));
+//        }
+//
+//        ResultSet rs = conn.getMetaData().getColumns(null, schema, tableName, null);
+//        while (rs.next()) {
+//            String columnName = rs.getString("COLUMN_NAME");
+//            String typeName = rs.getString("TYPE_NAME");
+//            boolean isPk = pkSet.contains(columnName);
+//            boolean nullable = rs.getInt("NULLABLE") == DatabaseMetaData.columnNullable;
+//            int length = rs.getInt("COLUMN_SIZE");
+//            String columnDefault = rs.getString("COLUMN_DEF"); // 기본값
+//            String remarks = rs.getString("REMARKS");          // 주석
+//
+//            list.add(FieldMetadata.of(
+//                    dbType, columnName, typeName, isPk, nullable, length, columnDefault, remarks
+//            ));
+//        }
+//
+//        return list;
+//    }
 
     private static String generateEmbeddedId(String className, List<FieldMetadata> pkFields) {
         StringBuilder sb = new StringBuilder();

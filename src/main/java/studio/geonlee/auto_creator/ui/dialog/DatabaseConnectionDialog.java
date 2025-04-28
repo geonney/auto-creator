@@ -1,11 +1,11 @@
-package studio.geonlee.auto_creator.dialog;
+package studio.geonlee.auto_creator.ui.dialog;
 
 import studio.geonlee.auto_creator.common.enumeration.DatabaseType;
 import studio.geonlee.auto_creator.config.DatabaseConfigFileHandler;
 import studio.geonlee.auto_creator.config.dto.DatabaseConfig;
 import studio.geonlee.auto_creator.config.message.MessageUtil;
 import studio.geonlee.auto_creator.context.DatabaseContext;
-import studio.geonlee.auto_creator.frame.MainFrame;
+import studio.geonlee.auto_creator.ui.frame.MainFrame;
 
 import javax.swing.*;
 import java.awt.*;

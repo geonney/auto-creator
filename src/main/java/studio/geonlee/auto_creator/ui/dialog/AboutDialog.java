@@ -1,4 +1,4 @@
-package studio.geonlee.auto_creator.dialog;
+package studio.geonlee.auto_creator.ui.dialog;
 
 import javax.swing.*;
 import java.awt.*;

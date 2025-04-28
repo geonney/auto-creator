@@ -2,15 +2,13 @@ package studio.geonlee.auto_creator.generator;
 
 import studio.geonlee.auto_creator.common.enumeration.DatabaseType;
 import studio.geonlee.auto_creator.common.record.FieldMetadata;
+import studio.geonlee.auto_creator.common.util.DatabaseMetaReader;
 import studio.geonlee.auto_creator.config.DefaultConfigFileHandler;
 import studio.geonlee.auto_creator.config.dto.DefaultConfig;
-import studio.geonlee.auto_creator.context.DatabaseContext;
-import studio.geonlee.auto_creator.frame.MainFrame;
+import studio.geonlee.auto_creator.ui.frame.MainFrame;
 
-import java.sql.Connection;
 import java.util.List;
 
-import static studio.geonlee.auto_creator.generator.EntityCodeGenerator.extractFieldMetadata;
 
 /**
  * @author GEON
@@ -23,11 +21,10 @@ public class RecordGenerator {
             String baseClassName,
             String tableName,
             String schema,
-            DatabaseType dbType
+            DatabaseType databaseType
     ) {
         try {
-            Connection conn = DatabaseContext.getConnection();
-            List<FieldMetadata> fields = extractFieldMetadata(conn, schema, tableName, dbType);
+            List<FieldMetadata> fields = DatabaseMetaReader.readTableFields(schema, tableName, databaseType);
 
             String recordName = baseClassName + mode + "Record";
 
@@ -45,7 +42,7 @@ public class RecordGenerator {
             DefaultConfig config = DefaultConfigFileHandler.load();
             boolean useSwagger = config.isUseSwagger();
 
-            String basePackage = config.getRecordBasePackage();
+            String basePackage = config.getDomainBasePackage();
             String recordPackage = basePackage + "." + tableName.toLowerCase() + ".record";
 
             StringBuilder sb = new StringBuilder();

@@ -1,4 +1,4 @@
-package studio.geonlee.auto_creator.frame;
+package studio.geonlee.auto_creator.ui.frame;
 
 import studio.geonlee.auto_creator.common.enumeration.DatabaseType;
 import studio.geonlee.auto_creator.config.DatabaseConfigFileHandler;
@@ -7,10 +7,10 @@ import studio.geonlee.auto_creator.config.dto.DatabaseConfig;
 import studio.geonlee.auto_creator.config.dto.DefaultConfig;
 import studio.geonlee.auto_creator.config.message.MessageUtil;
 import studio.geonlee.auto_creator.context.DatabaseContext;
-import studio.geonlee.auto_creator.dialog.AboutDialog;
-import studio.geonlee.auto_creator.dialog.DatabaseConnectionDialog;
-import studio.geonlee.auto_creator.dialog.SettingsDialog;
-import studio.geonlee.auto_creator.panel.CodeGeneratorPanel;
+import studio.geonlee.auto_creator.ui.dialog.AboutDialog;
+import studio.geonlee.auto_creator.ui.dialog.DatabaseConnectionDialog;
+import studio.geonlee.auto_creator.ui.dialog.SettingsDialog;
+import studio.geonlee.auto_creator.ui.panel.CodeGeneratorPanel;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -19,6 +19,8 @@ import javax.swing.tree.DefaultTreeModel;
 import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
@@ -44,6 +46,12 @@ public class MainFrame extends JFrame {
         instance = this;
         setTitle("🔧 Auto Code");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                saveWindowSettings();
+            }
+        });
 
         try {
             URL iconUrl = getClass().getClassLoader().getResource("icon/ci.png");
@@ -55,8 +63,14 @@ public class MainFrame extends JFrame {
             System.err.println("Icon setting Failure: " + e.getMessage());
         }
 
-        setSize(1000, 700);
-        setLocationRelativeTo(null);
+
+        DefaultConfig config = DefaultConfigFileHandler.load();
+        if (config != null && config.getWindowWidth() > 0 && config.getWindowHeight() > 0) {
+            setBounds(config.getWindowX(), config.getWindowY(), config.getWindowWidth(), config.getWindowHeight());
+        } else {
+            setSize(1200, 800); // 기본 사이즈
+            setLocationRelativeTo(null); // 화면 중앙
+        }
         setLayout(new BorderLayout());
 
         setupMenu();
@@ -228,6 +242,28 @@ public class MainFrame extends JFrame {
             }
         } catch (Exception e) {
             MainFrame.log(MessageUtil.get("last.setting.load.failure") + ": " + e.getMessage());
+        }
+    }
+
+    public void refreshCodeGeneratorPanel() {
+        if (codeGeneratorPanel != null) {
+            codeGeneratorPanel.refreshOrmSettings();
+        }
+    }
+
+    private void saveWindowSettings() {
+        try {
+            DefaultConfig config = DefaultConfigFileHandler.load();
+            if (config == null) config = new DefaultConfig();
+
+            config.setWindowX(getX());
+            config.setWindowY(getY());
+            config.setWindowWidth(getWidth());
+            config.setWindowHeight(getHeight());
+
+            DefaultConfigFileHandler.save(config);
+        } catch (Exception ex) {
+            MainFrame.log("❌ 창 위치/크기 저장 실패: " + ex.getMessage());
         }
     }
 }

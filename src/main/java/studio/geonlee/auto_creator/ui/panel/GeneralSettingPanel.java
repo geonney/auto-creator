@@ -1,9 +1,9 @@
-package studio.geonlee.auto_creator.panel;
+package studio.geonlee.auto_creator.ui.panel;
 
 import studio.geonlee.auto_creator.config.DefaultConfigFileHandler;
 import studio.geonlee.auto_creator.config.dto.DefaultConfig;
 import studio.geonlee.auto_creator.config.message.MessageUtil;
-import studio.geonlee.auto_creator.frame.MainFrame;
+import studio.geonlee.auto_creator.ui.frame.MainFrame;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,7 +20,6 @@ public class GeneralSettingPanel extends JPanel {
     private final JLabel themeLabel = new JLabel();
     //프로그램 시작시 마지막 DB 연결의 복원
     private final JCheckBox autoLoadDatabaseCheck = new JCheckBox(MessageUtil.get("checkbox.reload.last.database"));
-    private final JCheckBox useSwaggerCheck = new JCheckBox(MessageUtil.get("checkbox.swagger.annotation"));
     private final JComboBox<String> languageComboBox;
 
     public GeneralSettingPanel() {
@@ -36,10 +35,8 @@ public class GeneralSettingPanel extends JPanel {
 
         String[] languages = {"Korean", "English"};
         languageComboBox = new JComboBox<>(languages);
+        languageComboBox.setMaximumSize(new Dimension(Integer.MAX_VALUE, 28));
 
-        // DefaultConfig 에서 현재 설정된 언어 세팅
-        DefaultConfig config = DefaultConfigFileHandler.load();
-        languageComboBox.setSelectedItem(config.getLanguage().equalsIgnoreCase("ko") ? "Korean" : "English");
 
         // 항목 추가
         add(createSection(
@@ -49,8 +46,8 @@ public class GeneralSettingPanel extends JPanel {
         ));
 
         add(createSection(
-                MessageUtil.get("record.base.package.title"),
-                MessageUtil.get("record.base.package.description"),
+                MessageUtil.get("domain.base.package.title"),
+                MessageUtil.get("domain.base.package.description"),
                 recordPackageField
         ));
 
@@ -78,10 +75,7 @@ public class GeneralSettingPanel extends JPanel {
         add(Box.createVerticalStrut(10));
         add(autoLoadDatabaseCheck);
 
-        // swagger 사용 여부 체크박스
-        useSwaggerCheck.setAlignmentX(Component.LEFT_ALIGNMENT);
-        add(useSwaggerCheck); // ✅ 여기에 추가
-        add(Box.createVerticalStrut(20));
+
 
         JButton saveBtn = new JButton(MessageUtil.get("button.save"));
         saveBtn.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -156,11 +150,11 @@ public class GeneralSettingPanel extends JPanel {
         DefaultConfig config = DefaultConfigFileHandler.load();
         if (config != null) {
             entityPackageField.setText(config.getEntityBasePackage());
-            recordPackageField.setText(config.getRecordBasePackage());
+            recordPackageField.setText(config.getDomainBasePackage());
             savePathField.setText(config.getDefaultSavePath());
             themeLabel.setText(config.getTheme());
             autoLoadDatabaseCheck.setSelected(config.isAutoLoadDatabaseOnStart());
-            useSwaggerCheck.setSelected(config.isUseSwagger());
+            languageComboBox.setSelectedItem(config.getLanguage().equalsIgnoreCase("ko") ? "Korean" : "English");
         }
     }
 
@@ -170,10 +164,9 @@ public class GeneralSettingPanel extends JPanel {
             if (config == null) config = new DefaultConfig();
 
             config.setEntityBasePackage(entityPackageField.getText().trim());
-            config.setRecordBasePackage(recordPackageField.getText().trim());
+            config.setDomainBasePackage(recordPackageField.getText().trim());
             config.setDefaultSavePath(savePathField.getText().trim());
             config.setAutoLoadDatabaseOnStart(autoLoadDatabaseCheck.isSelected());
-            config.setUseSwagger(useSwaggerCheck.isSelected());
 
             String selected = (String) languageComboBox.getSelectedItem();
             String lang = "en";
@@ -181,8 +174,7 @@ public class GeneralSettingPanel extends JPanel {
                 lang = "ko";
             }
             config.setLanguage(lang);
-            DefaultConfigFileHandler.save(config);
-            MessageUtil.loadBundle(lang); // ✅ 언어 변경 즉시 적용
+//            MessageUtil.loadBundle(lang); // ✅ 언어 변경 즉시 적용
 
             DefaultConfigFileHandler.save(config);
 

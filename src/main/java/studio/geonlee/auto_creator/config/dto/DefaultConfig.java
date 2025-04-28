@@ -14,12 +14,19 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DefaultConfig {
-    private String defaultPackageName;
     private String entityBasePackage;
-    private String recordBasePackage;
+    private String domainBasePackage;
     private String defaultSavePath;
     private String theme;
     private boolean autoLoadDatabaseOnStart;
     private boolean useSwagger;
     private String language;
+    private String architecture;
+    private String orm;
+
+    // ✅ 창 위치 및 크기 추가
+    private int windowX = -1;
+    private int windowY = -1;
+    private int windowWidth = -1;
+    private int windowHeight = -1;
 }
