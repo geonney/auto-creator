@@ -65,10 +65,11 @@ public class MainFrame extends JFrame {
 
 
         DefaultConfig config = DefaultConfigFileHandler.load();
+        setMinimumSize(new Dimension(1070, 800)); // 원하는 최소 사이즈 설정
         if (config != null && config.getWindowWidth() > 0 && config.getWindowHeight() > 0) {
             setBounds(config.getWindowX(), config.getWindowY(), config.getWindowWidth(), config.getWindowHeight());
         } else {
-            setSize(1250, 800); // 기본 사이즈
+            setSize(1070, 800); // 기본 사이즈
             setLocationRelativeTo(null); // 화면 중앙
         }
         setLayout(new BorderLayout());
