@@ -62,7 +62,7 @@ public class CodeGeneratorPanel extends JPanel {
         topPanel.add(serviceLogicButton);
 
         queryButton = new JButton(MessageUtil.get("button.create.query"));
-        topPanel.add((queryButton));
+        topPanel.add(queryButton);
 
         add(topPanel, BorderLayout.NORTH);
 
@@ -99,18 +99,6 @@ public class CodeGeneratorPanel extends JPanel {
                 return;
             }
             serviceMenu.show(serviceLogicButton, 0, serviceLogicButton.getHeight());
-        });
-
-        // ✅ Service Logic 생성 버튼
-        queryButton.addActionListener(e -> {
-            String tableName = mainFrame.getSelectedTable();
-            if (tableName == null) {
-                JOptionPane.showMessageDialog(this,
-                        MessageUtil.get("choose.table.first"),
-                        "Warning", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-            queryMenu.show(queryButton, 0, queryButton.getHeight());
         });
 
         // ✅ 다운로드 버튼
