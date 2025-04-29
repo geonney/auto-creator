@@ -158,13 +158,6 @@ public class MainFrame extends JFrame {
         logArea.setWrapStyleWord(true);
     }
 
-    public static void log(String message) {
-        if (instance != null) {
-            instance.logArea.append(message + "\n");
-            instance.logArea.setCaretPosition(instance.logArea.getDocument().getLength());
-        }
-    }
-
     public void setDatabaseConnection(Connection conn, String dbName) {
         // 이후 테이블 트리 구성 등에 사용할 수 있도록 저장
         DatabaseContext.setConnection(conn);
@@ -281,5 +274,13 @@ public class MainFrame extends JFrame {
             tree.expandRow(row);
             row++;
         }
+    }
+
+    public static void log(String message) {
+        String timestamp = java.time.LocalDateTime.now()
+                .format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
+        instance.logArea.append("[" + timestamp + "] " + message + "\n");
+        instance.logArea.setCaretPosition(instance.logArea.getDocument().getLength()); // 항상 스크롤 맨 밑으로
     }
 }
