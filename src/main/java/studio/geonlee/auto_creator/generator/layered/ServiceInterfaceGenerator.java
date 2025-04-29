@@ -19,21 +19,36 @@ public class ServiceInterfaceGenerator {
         String entityName = meta.baseClassName();
 
         StringBuilder sb = new StringBuilder();
+
         sb.append("package ").append(fullPackage).append(";\n\n");
 
-        sb.append("import ").append(fullPackage).append(".record.").append(entityName).append("CreateRecord;\n");
-        sb.append("import ").append(fullPackage).append(".record.").append(entityName).append("UpdateRecord;\n");
-        sb.append("import ").append(fullPackage).append(".record.").append(entityName).append("DeleteRecord;\n");
-        sb.append("import ").append(fullPackage).append(".record.").append(entityName).append("SearchRecord;\n");
-        sb.append("import java.util.List;\n\n");
+        sb.append("import java.util.List;\n");
+        sb.append("import ").append(fullPackage).append(".record.").append(entityName).append("CreateRequestRecord;\n");
+        sb.append("import ").append(fullPackage).append(".record.").append(entityName).append("CreateResponseRecord;\n");
+        sb.append("import ").append(fullPackage).append(".record.").append(entityName).append("UpdateRequestRecord;\n");
+        sb.append("import ").append(fullPackage).append(".record.").append(entityName).append("UpdateResponseRecord;\n");
+        sb.append("import ").append(fullPackage).append(".record.").append(entityName).append("DeleteRequestRecord;\n");
+        sb.append("import ").append(fullPackage).append(".record.").append(entityName).append("DeleteResponseRecord;\n");
+        sb.append("import ").append(fullPackage).append(".record.").append(entityName).append("SearchRequestRecord;\n");
+        sb.append("import ").append(fullPackage).append(".record.").append(entityName).append("SearchResponseRecord;\n\n");
 
         sb.append("public interface ").append(entityName).append("Service {\n\n");
 
-        sb.append("    void create(").append(entityName).append("CreateRecord request);\n\n");
-        sb.append("    void update(").append(entityName).append("UpdateRecord request);\n\n");
-        sb.append("    void delete(").append(entityName).append("DeleteRecord request);\n\n");
-        sb.append("    List<").append(entityName).append("SearchRecord> search(")
-                .append(entityName).append("SearchRecord request);\n");
+        // Create
+        sb.append("    ").append(entityName).append("CreateResponseRecord create(")
+                .append(entityName).append("CreateRequestRecord request);\n\n");
+
+        // Update
+        sb.append("    ").append(entityName).append("UpdateResponseRecord update(")
+                .append(entityName).append("UpdateRequestRecord request);\n\n");
+
+        // Delete
+        sb.append("    ").append(entityName).append("DeleteResponseRecord delete(")
+                .append(entityName).append("DeleteRequestRecord request);\n\n");
+
+        // Search
+        sb.append("    List<").append(entityName).append("SearchResponseRecord> search(")
+                .append(entityName).append("SearchRequestRecord request);\n");
 
         sb.append("}\n");
 

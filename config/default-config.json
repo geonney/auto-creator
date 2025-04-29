@@ -7,9 +7,9 @@
   "useSwagger" : true,
   "language" : "ko",
   "architecture" : "layered",
-  "orm" : "mybatis",
-  "windowX" : 433,
-  "windowY" : 238,
-  "windowWidth" : 1026,
-  "windowHeight" : 635
+  "orm" : "jpa",
+  "windowX" : 325,
+  "windowY" : 155,
+  "windowWidth" : 1096,
+  "windowHeight" : 800
 }

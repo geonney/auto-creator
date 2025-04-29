@@ -150,28 +150,55 @@ public class CodeGeneratorPanel extends JPanel {
     private void setupRecordButton() {
         JPopupMenu recordMenu = new JPopupMenu();
 
-        for (String type : List.of("Create", "Update", "Delete", "Search")) {
+        List<String> recordTypes = List.of(
+                "Create Request", "Create Response",
+                "Update Request", "Update Response",
+                "Delete Request", "Delete Response",
+                "Search Request", "Search Response"
+        );
+
+        for (String type : recordTypes) {
             JMenuItem item = new JMenuItem(type);
             item.addActionListener(e -> {
                 String className = classNameField.getText().trim();
                 if (className.isEmpty()) return;
 
+                String tableName = mainFrame.getSelectedTable();
+                if (tableName == null) {
+                    JOptionPane.showMessageDialog(this,
+                            MessageUtil.get("choose.table.first"),
+                            "Warning", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+
+                String schema = mainFrame.getSelectedSchema();
+                DatabaseType dbType = DatabaseContext.getDatabaseType();
+
+                // ✅ "Create Request" → "create-request" 형태로 변환
+                String mode = type.toLowerCase().replace(" ", "-");
+
                 String code = RecordGenerator.generate(
-                        type,
+                        mode,
                         className,
-                        mainFrame.getSelectedTable(),
-                        mainFrame.getSelectedSchema(),
-                        DatabaseContext.getDatabaseType()
+                        tableName,
+                        schema,
+                        dbType
                 );
 
                 previewArea.setText(code);
-                currentCodeType = switch (type.toLowerCase()) {
-                    case "create" -> CodeType.RECORD_CREATE;
-                    case "update" -> CodeType.RECORD_UPDATE;
-                    case "delete" -> CodeType.RECORD_DELETE;
-                    case "search" -> CodeType.RECORD_SEARCH;
+
+                currentCodeType = switch (mode) {
+                    case "create-request" -> CodeType.RECORD_CREATE_REQUEST;
+                    case "create-response" -> CodeType.RECORD_CREATE_RESPONSE;
+                    case "update-request" -> CodeType.RECORD_UPDATE_REQUEST;
+                    case "update-response" -> CodeType.RECORD_UPDATE_RESPONSE;
+                    case "delete-request" -> CodeType.RECORD_DELETE_REQUEST;
+                    case "delete-response" -> CodeType.RECORD_DELETE_RESPONSE;
+                    case "search-request" -> CodeType.RECORD_SEARCH_REQUEST;
+                    case "search-response" -> CodeType.RECORD_SEARCH_RESPONSE;
                     default -> null;
                 };
+
                 MainFrame.log(MessageUtil.get("record.create.success") + ": " + className + " (" + type + ")");
             });
             recordMenu.add(item);
@@ -312,10 +339,14 @@ public class CodeGeneratorPanel extends JPanel {
         }
 
         String defaultName = switch (currentCodeType) {
-            case RECORD_CREATE -> classNameField.getText().trim() + "CreateRecord.java";
-            case RECORD_UPDATE -> classNameField.getText().trim() + "UpdateRecord.java";
-            case RECORD_DELETE -> classNameField.getText().trim() + "DeleteRecord.java";
-            case RECORD_SEARCH -> classNameField.getText().trim() + "SearchRecord.java";
+            case RECORD_CREATE_REQUEST -> classNameField.getText().trim() + "CreateRequestRecord.java";
+            case RECORD_CREATE_RESPONSE -> classNameField.getText().trim() + "CreateResponseRecord.java";
+            case RECORD_UPDATE_REQUEST -> classNameField.getText().trim() + "UpdateRequestRecord.java";
+            case RECORD_UPDATE_RESPONSE -> classNameField.getText().trim() + "UpdateResponseRecord.java";
+            case RECORD_DELETE_REQUEST -> classNameField.getText().trim() + "DeleteRequestRecord.java";
+            case RECORD_DELETE_RESPONSE -> classNameField.getText().trim() + "DeleteResponseRecord.java";
+            case RECORD_SEARCH_REQUEST -> classNameField.getText().trim() + "SearchRequestRecord.java";
+            case RECORD_SEARCH_RESPONSE -> classNameField.getText().trim() + "SearchResponseRecord.java";
             case CONTROLLER -> classNameField.getText().trim() + "Controller.java";
             case SERVICE_INTERFACE -> classNameField.getText().trim() + "Service.java";
             case SERVICE_IMPL -> classNameField.getText().trim() + "ServiceImpl.java";

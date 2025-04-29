@@ -24,23 +24,27 @@ public class MapperGenerator {
 
         sb.append("import org.apache.ibatis.annotations.Mapper;\n");
         sb.append("import java.util.List;\n");
-        sb.append("\n");
+        sb.append("import ").append(fullPackage).append(".record.").append(entityName).append("CreateRequestRecord;\n");
+        sb.append("import ").append(fullPackage).append(".record.").append(entityName).append("UpdateRequestRecord;\n");
+        sb.append("import ").append(fullPackage).append(".record.").append(entityName).append("DeleteRequestRecord;\n");
+        sb.append("import ").append(fullPackage).append(".record.").append(entityName).append("SearchRequestRecord;\n");
+        sb.append("import ").append(fullPackage).append(".record.").append(entityName).append("SearchResponseRecord;\n\n");
 
         sb.append("@Mapper\n");
         sb.append("public interface ").append(entityName).append("Mapper {\n\n");
 
-        // ✅ Insert
-        sb.append("    void insert(").append(entityName).append("CreateRecord request);\n\n");
+        // Insert
+        sb.append("    void insert(").append(entityName).append("CreateRequestRecord request);\n\n");
 
-        // ✅ Update
-        sb.append("    void update(").append(entityName).append("UpdateRecord request);\n\n");
+        // Update
+        sb.append("    void update(").append(entityName).append("UpdateRequestRecord request);\n\n");
 
-        // ✅ Delete (복합키 여부 상관 없이 DeleteRecord로 고정)
-        sb.append("    void delete(").append(entityName).append("DeleteRecord request);\n\n");
+        // Delete
+        sb.append("    void delete(").append(entityName).append("DeleteRequestRecord request);\n\n");
 
-        // ✅ Search
-        sb.append("    List<").append(entityName).append("SearchRecord> search(")
-                .append(entityName).append("SearchRecord request);\n");
+        // Search
+        sb.append("    List<").append(entityName).append("SearchResponseRecord> search(")
+                .append(entityName).append("SearchRequestRecord request);\n");
 
         sb.append("}\n");
 

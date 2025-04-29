@@ -68,7 +68,7 @@ public class MainFrame extends JFrame {
         if (config != null && config.getWindowWidth() > 0 && config.getWindowHeight() > 0) {
             setBounds(config.getWindowX(), config.getWindowY(), config.getWindowWidth(), config.getWindowHeight());
         } else {
-            setSize(1200, 800); // 기본 사이즈
+            setSize(1250, 800); // 기본 사이즈
             setLocationRelativeTo(null); // 화면 중앙
         }
         setLayout(new BorderLayout());
@@ -199,7 +199,8 @@ public class MainFrame extends JFrame {
             }
 
             ((DefaultTreeModel) tableTree.getModel()).reload();
-            tableTree.expandRow(0);
+//            tableTree.expandRow(0);
+            expandAllNodes(tableTree); // ✅ 트리 확장 여기 추가
             MainFrame.log(MessageUtil.get("table.load.success"));
         } catch (Exception ex) {
             MainFrame.log(MessageUtil.get("table.load.failure") + ": " + ex.getMessage());
@@ -264,6 +265,14 @@ public class MainFrame extends JFrame {
             DefaultConfigFileHandler.save(config);
         } catch (Exception ex) {
             MainFrame.log("❌ 창 위치/크기 저장 실패: " + ex.getMessage());
+        }
+    }
+
+    private void expandAllNodes(JTree tree) {
+        int row = 0;
+        while (row < tree.getRowCount()) {
+            tree.expandRow(row);
+            row++;
         }
     }
 }
