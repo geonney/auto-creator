@@ -6,7 +6,7 @@
   "autoLoadDatabaseOnStart" : true,
   "expandTree" : true,
   "useSwagger" : true,
-  "language" : "ko",
+  "language" : "en",
   "architecture" : "layered",
   "orm" : "jpa",
   "windowX" : 325,
