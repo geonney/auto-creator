@@ -4,6 +4,7 @@
   "defaultSavePath" : "C:/Users/GEON/Desktop",
   "theme" : "FlatDarculaLaf",
   "autoLoadDatabaseOnStart" : true,
+  "expandTree" : true,
   "useSwagger" : true,
   "language" : "ko",
   "architecture" : "layered",

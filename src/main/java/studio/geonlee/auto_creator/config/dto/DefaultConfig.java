@@ -19,6 +19,7 @@ public class DefaultConfig {
     private String defaultSavePath;
     private String theme;
     private boolean autoLoadDatabaseOnStart;
+    private boolean expandTree;
     private boolean useSwagger;
     private String language;
     private String architecture;

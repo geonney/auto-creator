@@ -20,6 +20,7 @@ public class GeneralSettingPanel extends JPanel {
     private final JLabel themeLabel = new JLabel();
     //프로그램 시작시 마지막 DB 연결의 복원
     private final JCheckBox autoLoadDatabaseCheck = new JCheckBox(MessageUtil.get("checkbox.reload.last.database"));
+    private final JCheckBox expandTreeCheck = new JCheckBox(MessageUtil.get("checkbox.expand.tree"));
     private final JComboBox<String> languageComboBox;
 
     public GeneralSettingPanel() {
@@ -75,7 +76,10 @@ public class GeneralSettingPanel extends JPanel {
         add(Box.createVerticalStrut(10));
         add(autoLoadDatabaseCheck);
 
-
+        //트리 확장 체크박스
+        expandTreeCheck.setAlignmentX(Component.LEFT_ALIGNMENT);
+        add(Box.createVerticalStrut(10));
+        add(expandTreeCheck);
 
         JButton saveBtn = new JButton(MessageUtil.get("button.save"));
         saveBtn.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -154,6 +158,7 @@ public class GeneralSettingPanel extends JPanel {
             savePathField.setText(config.getDefaultSavePath());
             themeLabel.setText(config.getTheme());
             autoLoadDatabaseCheck.setSelected(config.isAutoLoadDatabaseOnStart());
+            expandTreeCheck.setSelected(config.isExpandTree());
             languageComboBox.setSelectedItem(config.getLanguage().equalsIgnoreCase("ko") ? "Korean" : "English");
         }
     }
@@ -167,6 +172,7 @@ public class GeneralSettingPanel extends JPanel {
             config.setDomainBasePackage(recordPackageField.getText().trim());
             config.setDefaultSavePath(savePathField.getText().trim());
             config.setAutoLoadDatabaseOnStart(autoLoadDatabaseCheck.isSelected());
+            config.setExpandTree(expandTreeCheck.isSelected());
 
             String selected = (String) languageComboBox.getSelectedItem();
             String lang = "en";

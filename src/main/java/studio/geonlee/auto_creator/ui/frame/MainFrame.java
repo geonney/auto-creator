@@ -199,8 +199,14 @@ public class MainFrame extends JFrame {
             }
 
             ((DefaultTreeModel) tableTree.getModel()).reload();
-//            tableTree.expandRow(0);
-            expandAllNodes(tableTree); // ✅ 트리 확장 여기 추가
+
+            DefaultConfig config = DefaultConfigFileHandler.load();
+            if (config != null && config.isExpandTree()) {
+                expandAllNodes(tableTree); // ✅ 트리 확장 여기 추가
+            } else {
+                tableTree.expandRow(0);
+            }
+
             MainFrame.log(MessageUtil.get("table.load.success"));
         } catch (Exception ex) {
             MainFrame.log(MessageUtil.get("table.load.failure") + ": " + ex.getMessage());
