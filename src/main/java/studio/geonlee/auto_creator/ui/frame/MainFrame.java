@@ -65,7 +65,7 @@ public class MainFrame extends JFrame {
 
 
         DefaultConfig config = DefaultConfigFileHandler.load();
-        setMinimumSize(new Dimension(1070, 800)); // 원하는 최소 사이즈 설정
+        setMinimumSize(new Dimension(1070, 800));
         if (config != null && config.getWindowWidth() > 0 && config.getWindowHeight() > 0) {
             setBounds(config.getWindowX(), config.getWindowY(), config.getWindowWidth(), config.getWindowHeight());
         } else {
@@ -156,13 +156,6 @@ public class MainFrame extends JFrame {
         logArea.setRows(8);
         logArea.setLineWrap(true);
         logArea.setWrapStyleWord(true);
-    }
-
-    public static void log(String message) {
-        if (instance != null) {
-            instance.logArea.append(message + "\n");
-            instance.logArea.setCaretPosition(instance.logArea.getDocument().getLength());
-        }
     }
 
     public void setDatabaseConnection(Connection conn, String dbName) {
@@ -281,5 +274,13 @@ public class MainFrame extends JFrame {
             tree.expandRow(row);
             row++;
         }
+    }
+
+    public static void log(String message) {
+        String timestamp = java.time.LocalDateTime.now()
+                .format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
+        instance.logArea.append("[" + timestamp + "] " + message + "\n");
+        instance.logArea.setCaretPosition(instance.logArea.getDocument().getLength()); // 항상 스크롤 맨 밑으로
     }
 }
