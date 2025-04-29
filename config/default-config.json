@@ -6,6 +6,7 @@
   "autoLoadDatabaseOnStart" : true,
   "expandTree" : true,
   "useSwagger" : true,
+  "useMapStruct" : true,
   "language" : "en",
   "architecture" : "layered",
   "orm" : "jpa",

@@ -21,6 +21,7 @@ public class DefaultConfig {
     private boolean autoLoadDatabaseOnStart;
     private boolean expandTree;
     private boolean useSwagger;
+    private boolean useMapStruct;
     private String language;
     private String architecture;
     private String orm;

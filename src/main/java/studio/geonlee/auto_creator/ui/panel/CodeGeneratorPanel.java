@@ -270,6 +270,7 @@ public class CodeGeneratorPanel extends JPanel {
             case "Service Interface" -> ServiceInterfaceGenerator.generate(entityMeta);
             case "Service Impl" -> ServiceImplGenerator.generate(entityMeta);
             case "Repository" -> RepositoryGenerator.generate(entityMeta);
+            case "MapStruct Mapper" -> MapStructMapperGenerator.generate(entityMeta);
             case "Mapper" -> MapperGenerator.generate(entityMeta);
             case "Query xml" -> MybatisXmlGenerator.generate(entityMeta);
             default -> "";
@@ -282,6 +283,7 @@ public class CodeGeneratorPanel extends JPanel {
             case "Service Interface" -> CodeType.SERVICE_INTERFACE;
             case "Service Impl" -> CodeType.SERVICE_IMPL;
             case "Repository" -> CodeType.REPOSITORY;
+            case "MapStruct Mapper" -> CodeType.MAPSTRUCT_MAPPER;
             case "Mapper" -> CodeType.MAPPER;
             case "Query xml" -> CodeType.XML;
             default -> null;
@@ -296,6 +298,8 @@ public class CodeGeneratorPanel extends JPanel {
         String orm = config.getOrm();
 
         boolean isJpa = "jpa".equalsIgnoreCase(orm);
+        boolean useMapStruct = config.isUseMapStruct();
+
         boolean isMybatis = "mybatis".equalsIgnoreCase(orm);
 
         entityButton.setVisible(isJpa);
@@ -304,6 +308,9 @@ public class CodeGeneratorPanel extends JPanel {
         List<String> serviceTypes = new ArrayList<>(List.of("Controller", "Service Interface", "Service Impl"));
         if (isJpa) {
             serviceTypes.add("Repository");
+            if (useMapStruct) {
+                serviceTypes.add("MapStruct Mapper");  // ✅ MapStruct Mapper
+            }
         } else if (isMybatis) {
             serviceTypes.add("Mapper");
             serviceTypes.add("Query xml");
@@ -339,7 +346,7 @@ public class CodeGeneratorPanel extends JPanel {
             case SERVICE_INTERFACE -> classNameField.getText().trim() + "Service.java";
             case SERVICE_IMPL -> classNameField.getText().trim() + "ServiceImpl.java";
             case REPOSITORY -> classNameField.getText().trim() + "Repository.java";
-            case MAPPER -> classNameField.getText().trim() + "Mapper.java";
+            case MAPSTRUCT_MAPPER, MAPPER -> classNameField.getText().trim() + "Mapper.java";
             case XML -> classNameField.getText().trim() + "Mapper.xml";
             default -> classNameField.getText().trim() + ".java";
         };

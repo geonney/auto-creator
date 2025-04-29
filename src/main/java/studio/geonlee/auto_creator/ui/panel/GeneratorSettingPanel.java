@@ -19,6 +19,7 @@ public class GeneratorSettingPanel extends JPanel {
     private final JComboBox<String> architectureComboBox;
     private final JComboBox<String> ormComboBox;
     private final JCheckBox useSwaggerCheck = new JCheckBox(MessageUtil.get("checkbox.swagger.annotation"));
+    private final JCheckBox useMapStructCheck = new JCheckBox(MessageUtil.get("checkbox.mapStruct"));
     private final MainFrame mainFrame;
 
     public GeneratorSettingPanel(MainFrame mainFrame) {
@@ -50,8 +51,10 @@ public class GeneratorSettingPanel extends JPanel {
 
         // swagger 사용 여부 체크박스
         useSwaggerCheck.setAlignmentX(Component.LEFT_ALIGNMENT);
-        add(useSwaggerCheck); // ✅ 여기에 추가
-        add(Box.createVerticalStrut(20));
+        add(useSwaggerCheck);
+
+        useMapStructCheck.setAlignmentX(Component.LEFT_ALIGNMENT);
+        add(useMapStructCheck);
 
         JButton saveBtn = new JButton(MessageUtil.get("button.save"));
         saveBtn.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -98,6 +101,7 @@ public class GeneratorSettingPanel extends JPanel {
                     ? config.getOrm().toUpperCase()
                     : CaseUtils.toUppercaseFirstLetter(config.getOrm())));
             useSwaggerCheck.setSelected(config.isUseSwagger());
+            useMapStructCheck.setSelected(config.isUseMapStruct());
         }
     }
 
@@ -109,6 +113,7 @@ public class GeneratorSettingPanel extends JPanel {
             config.setArchitecture(String.valueOf(architectureComboBox.getSelectedItem()).toLowerCase());
             config.setOrm(String.valueOf(ormComboBox.getSelectedItem()).toLowerCase());
             config.setUseSwagger(useSwaggerCheck.isSelected());
+            config.setUseMapStruct(useMapStructCheck.isSelected());
 
             DefaultConfigFileHandler.save(config);
 
