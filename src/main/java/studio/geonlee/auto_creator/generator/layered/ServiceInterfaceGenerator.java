@@ -46,8 +46,14 @@ public class ServiceInterfaceGenerator {
         sb.append("    ").append(entityName).append("DeleteResponseRecord delete(")
                 .append(entityName).append("DeleteRequestRecord request);\n\n");
 
-        // Search
-        sb.append("    List<").append(entityName).append("SearchResponseRecord> search(")
+        // List search
+        sb.append("    List<").append(entityName).append("SearchResponseRecord> listSearch(")
+                .append(entityName).append("SearchRequestRecord request);\n");
+
+        sb.append("}\n");
+
+        // List search
+        sb.append("    ").append(entityName).append("SearchResponseRecord detailSearch(")
                 .append(entityName).append("SearchRequestRecord request);\n");
 
         sb.append("}\n");

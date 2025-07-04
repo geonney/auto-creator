@@ -61,10 +61,17 @@ public class ServiceImplGenerator {
         sb.append("    }\n\n");
 
         sb.append("    @Override\n");
-        sb.append("    public List<").append(entityName).append("SearchResponseRecord> search(")
+        sb.append("    public List<").append(entityName).append("SearchResponseRecord> listSearch(")
                 .append(entityName).append("SearchRequestRecord request) {\n");
-        sb.append("        // TODO: Search logic\n");
+        sb.append("        // TODO: list search logic\n");
         sb.append("        return List.of();\n");
+        sb.append("    }\n");
+
+        sb.append("    @Override\n");
+        sb.append("    public ").append(entityName).append("SearchResponseRecord detailSearch(")
+                .append(entityName).append("SearchRequestRecord request) {\n");
+        sb.append("        // TODO: Detail search logic\n");
+        sb.append("        return null;\n");
         sb.append("    }\n");
 
         sb.append("}\n");

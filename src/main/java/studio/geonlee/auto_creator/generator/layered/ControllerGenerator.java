@@ -11,9 +11,10 @@ public class ControllerGenerator {
         DefaultConfig config = DefaultConfigFileHandler.load();
         boolean useSwagger = config.isUseSwagger();
 
-        String basePackage = config.getDomainBasePackage();
+        String domainBasePackage = config.getDomainBasePackage();
+        String basePackage = domainBasePackage.replace(".domain", "");
         String domain = meta.tableName().toLowerCase();
-        String fullPackage = basePackage + "." + domain;
+        String fullPackage = domainBasePackage + "." + domain;
 
         String entityName = meta.baseClassName();
         String entityNameLower = CaseUtils.toCamelCase(entityName);
@@ -25,7 +26,9 @@ public class ControllerGenerator {
         sb.append("import lombok.RequiredArgsConstructor;\n");
         sb.append("import jakarta.validation.Valid;\n");
         sb.append("import org.springframework.web.bind.annotation.*;\n");
-        sb.append("import org.springframework.http.ResponseEntity;\n");  // ✅ 추가
+        sb.append("import org.springframework.http.ResponseEntity;\n");
+        sb.append("import ").append(basePackage).append(".common.response").append(".ItemResponse;\n");
+        sb.append("import ").append(basePackage).append(".common.response").append(".ItemsResponse;\n");
         sb.append("import ").append(fullPackage).append(".record.").append(entityName).append("CreateRequestRecord;\n");
         sb.append("import ").append(fullPackage).append(".record.").append(entityName).append("CreateResponseRecord;\n");
         sb.append("import ").append(fullPackage).append(".record.").append(entityName).append("UpdateRequestRecord;\n");
@@ -44,7 +47,7 @@ public class ControllerGenerator {
         sb.append("import java.util.List;\n\n");
 
         if (useSwagger) {
-            sb.append("@Tag(name = \"").append(entityName).append(" Controller\")\n");
+            sb.append("@Tag(name = \"").append(entityName).append("\")\n");
         }
         sb.append("@RestController\n");
         sb.append("@RequestMapping(\"/api/").append(domain).append("\")\n");
@@ -89,19 +92,51 @@ public class ControllerGenerator {
         sb.append("        return ResponseEntity.ok(").append(entityNameLower).append("Service.delete(request));\n");
         sb.append("    }\n\n");
 
-        // Search
+        // List Search
         if (useSwagger) {
-            sb.append("    @Operation(summary = \"").append(entityName).append(" 조회\", description = \"")
+            sb.append("    @Operation(summary = \"").append(entityName).append(" 목록 조회\", description = \"")
                     .append(entityName).append(" 목록을 조회합니다.\")\n");
         }
         sb.append("    @GetMapping\n");
-        sb.append("    public List<").append(entityName)
-                .append("SearchResponseRecord> search(\n            @ModelAttribute @Valid ")
+        sb.append("    public ResponseEntity<ItemsResponse<").append(entityName)
+                .append("SearchResponseRecord>> listSearch(\n            @ModelAttribute @Valid ")
                 .append(entityName).append("SearchRequestRecord request) {\n");
-        sb.append("        return ").append(entityNameLower).append("Service.search(request);\n");
+        sb.append("        List<").append(entityName).append("SearchResponseRecord> list = ")
+                .append(entityNameLower).append("Service.listSearch(request);\n");
+        sb.append("        return ResponseEntity\n");
+        sb.append("                 .ok()\n");
+        sb.append("                 .body(ItemsResponse.<").append(entityName).append("SearchResponseRecord>builder()\n");
+        sb.append("                         .status(\"OK\")\n");
+        sb.append("                         .message(\"데이터 목록을 조회하는데 성공하였습니다.\")\n");
+        sb.append("                         .totalSize((long) list.size())\n");
+        sb.append("                         .items(list)\n");
+        sb.append("                         .build());\n");
         sb.append("    }\n");
 
         sb.append("}\n");
+
+        // single Search
+        if (useSwagger) {
+            sb.append("    @Operation(summary = \"").append(entityName).append(" 상세 조회\", description = \"")
+                    .append(entityName).append(" 상세 조회합니다.\")\n");
+        }
+        sb.append("    @GetMapping\n");
+        sb.append("    public ResponseEntity<ItemResponse<").append(entityName)
+                .append("SearchResponseRecord>> detailSearch(\n            @ModelAttribute @Valid ")
+                .append(entityName).append("SearchRequestRecord request) {\n");
+        sb.append("        ").append(entityName).append("SearchResponseRecord> data = ")
+                .append(entityNameLower).append("Service.detailSearch(request);\n");
+        sb.append("        return ResponseEntity\n");
+        sb.append("                 .ok()\n");
+        sb.append("                 .body(ItemResponse.<").append(entityName).append("SearchResponseRecord>builder()\n");
+        sb.append("                         .status(\"OK\")\n");
+        sb.append("                         .message(\"상세 데이터를 조회하는데 성공하였습니다.\")\n");
+        sb.append("                         .item(data)\n");
+        sb.append("                         .build());\n");
+        sb.append("    }\n");
+
+        sb.append("}\n");
+
 
         return sb.toString();
     }

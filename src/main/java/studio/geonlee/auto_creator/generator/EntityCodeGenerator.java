@@ -30,7 +30,7 @@ public class EntityCodeGenerator {
 
             sb.append("package ").append(entityBasePackage).append(";").append("\n\n");
             sb.append("import jakarta.persistence.*;\n");
-            sb.append("import lombok.Getter;\nimport lombok.Setter;\n");
+            sb.append("import lombok.Getter;\n");
             sb.append("import java.time.*;\n\n");
             boolean usesBigDecimal = fields.stream()
                     .anyMatch(f -> f.javaType().equals("BigDecimal"));
