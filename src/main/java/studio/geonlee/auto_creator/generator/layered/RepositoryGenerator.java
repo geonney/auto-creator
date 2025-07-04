@@ -2,6 +2,7 @@ package studio.geonlee.auto_creator.generator.layered;
 
 import studio.geonlee.auto_creator.common.record.EntityMetadata;
 import studio.geonlee.auto_creator.common.record.FieldMetadata;
+import studio.geonlee.auto_creator.common.util.CaseUtils;
 import studio.geonlee.auto_creator.config.DefaultConfigFileHandler;
 import studio.geonlee.auto_creator.config.dto.DefaultConfig;
 
@@ -16,7 +17,9 @@ public class RepositoryGenerator {
     public static String generate(EntityMetadata meta) {
         DefaultConfig config = DefaultConfigFileHandler.load();
         String basePackage = config.getDomainBasePackage();
-        String domain = meta.tableName().toLowerCase();
+        String tableName = meta.tableName().toLowerCase();
+        String domain = tableName.substring(tableName.lastIndexOf('_') + 1);
+        String pascalDomain = CaseUtils.toPascalCase(domain);
         String fullPackage = basePackage + "." + domain;
 
         String entityName = meta.baseClassName();
@@ -40,9 +43,9 @@ public class RepositoryGenerator {
         sb.append("import org.springframework.stereotype.Repository;\n\n");
 
         sb.append("@Repository\n");
-        sb.append("public interface ").append(entityName)
+        sb.append("public interface ").append((pascalDomain))
                 .append("Repository extends JpaRepository<")
-                .append(entityName).append(", ").append(pkType).append("> {\n");
+                .append(CaseUtils.toUppercaseFirstLetter(tableName)).append(", ").append(pkType).append("> {\n");
         sb.append("}\n");
 
         return sb.toString();

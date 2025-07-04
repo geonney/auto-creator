@@ -14,11 +14,10 @@ public class ServiceImplGenerator {
     public static String generate(EntityMetadata meta) {
         DefaultConfig config = DefaultConfigFileHandler.load();
         String basePackage = config.getDomainBasePackage();
-        String domain = meta.tableName().toLowerCase();
+        String tableName = meta.tableName().toLowerCase();
+        String domain = tableName.substring(tableName.lastIndexOf('_') + 1);
+        String pascalDomain = CaseUtils.toPascalCase(domain);
         String fullPackage = basePackage + "." + domain;
-
-        String entityName = meta.baseClassName();
-        String entityNameLower = CaseUtils.toCamelCase(entityName);
 
         StringBuilder sb = new StringBuilder();
         sb.append("package ").append(fullPackage).append(";\n\n");
@@ -26,50 +25,53 @@ public class ServiceImplGenerator {
         sb.append("import lombok.RequiredArgsConstructor;\n");
         sb.append("import org.springframework.stereotype.Service;\n");
         sb.append("import java.util.List;\n");
-        sb.append("import ").append(fullPackage).append(".").append(entityName).append("Repository;\n");
-        sb.append("import ").append(fullPackage).append(".record.").append(entityName).append("CreateRequestRecord;\n");
-        sb.append("import ").append(fullPackage).append(".record.").append(entityName).append("CreateResponseRecord;\n");
-        sb.append("import ").append(fullPackage).append(".record.").append(entityName).append("UpdateRequestRecord;\n");
-        sb.append("import ").append(fullPackage).append(".record.").append(entityName).append("UpdateResponseRecord;\n");
-        sb.append("import ").append(fullPackage).append(".record.").append(entityName).append("DeleteRequestRecord;\n");
-        sb.append("import ").append(fullPackage).append(".record.").append(entityName).append("DeleteResponseRecord;\n");
-        sb.append("import ").append(fullPackage).append(".record.").append(entityName).append("SearchRequestRecord;\n");
-        sb.append("import ").append(fullPackage).append(".record.").append(entityName).append("SearchResponseRecord;\n\n");
+        sb.append("import ").append(fullPackage).append(".").append(pascalDomain).append("Repository;\n");
+        sb.append("import ").append(fullPackage).append(".record.").append(pascalDomain).append("CreateRequestRecord;\n");
+        sb.append("import ").append(fullPackage).append(".record.").append(pascalDomain).append("CreateResponseRecord;\n");
+        sb.append("import ").append(fullPackage).append(".record.").append(pascalDomain).append("UpdateRequestRecord;\n");
+        sb.append("import ").append(fullPackage).append(".record.").append(pascalDomain).append("UpdateResponseRecord;\n");
+        sb.append("import ").append(fullPackage).append(".record.").append(pascalDomain).append("DeleteRequestRecord;\n");
+        sb.append("import ").append(fullPackage).append(".record.").append(pascalDomain).append("DeleteResponseRecord;\n");
+        sb.append("import ").append(fullPackage).append(".record.").append(pascalDomain).append("SearchRequestRecord;\n");
+        sb.append("import ").append(fullPackage).append(".record.").append(pascalDomain).append("SearchResponseRecord;\n\n");
 
         sb.append("@Service\n");
         sb.append("@RequiredArgsConstructor\n");
-        sb.append("public class ").append(entityName).append("ServiceImpl implements ").append(entityName).append("Service {\n\n");
+        sb.append("public class ").append(pascalDomain).append("ServiceImpl implements ").append(pascalDomain).append("Service {\n\n");
 
-        sb.append("    private final ").append(entityName).append("Repository ").append(entityNameLower).append("Repository;\n\n");
+        sb.append("    private final ").append(pascalDomain).append("Repository ").append(pascalDomain).append("Repository;\n\n");
 
         sb.append("    @Override\n");
-        sb.append("    public ").append(entityName).append("CreateResponseRecord create(")
-                .append(entityName).append("CreateRequestRecord request) {\n");
+        sb.append("    public ").append(pascalDomain).append("CreateResponseRecord create(")
+                .append(pascalDomain).append("CreateRequestRecord request) {\n");
         sb.append("        // TODO: Create logic\n");
+        sb.append("        return null;\n");
         sb.append("    }\n\n");
 
         sb.append("    @Override\n");
-        sb.append("    public ").append(entityName).append("UpdateResponseRecord update(")
-                .append(entityName).append("UpdateRequestRecord request) {\n");
-        sb.append("        // TODO: Update logic\n");
+        sb.append("    public ").append(pascalDomain).append("ModifyResponseRecord modify(")
+                .append(pascalDomain).append("ModifyRequestRecord request) {\n");
+        sb.append("        // TODO: Modify logic\n");
+        sb.append("        return null;\n");
         sb.append("    }\n\n");
 
         sb.append("    @Override\n");
-        sb.append("    public ").append(entityName).append("DeleteResponseRecord delete(")
-                .append(entityName).append("DeleteRequestRecord request) {\n");
+        sb.append("    public ").append(pascalDomain).append("DeleteResponseRecord delete(")
+                .append(pascalDomain).append("DeleteRequestRecord request) {\n");
         sb.append("        // TODO: Delete logic\n");
+        sb.append("        return null;\n");
         sb.append("    }\n\n");
 
         sb.append("    @Override\n");
-        sb.append("    public List<").append(entityName).append("SearchResponseRecord> listSearch(")
-                .append(entityName).append("SearchRequestRecord request) {\n");
+        sb.append("    public List<").append(pascalDomain).append("SearchResponseRecord> searchList(")
+                .append(pascalDomain).append("SearchRequestRecord request) {\n");
         sb.append("        // TODO: list search logic\n");
         sb.append("        return List.of();\n");
-        sb.append("    }\n");
+        sb.append("    }\n\n");
 
         sb.append("    @Override\n");
-        sb.append("    public ").append(entityName).append("SearchResponseRecord detailSearch(")
-                .append(entityName).append("SearchRequestRecord request) {\n");
+        sb.append("    public ").append(pascalDomain).append("SearchResponseRecord searchDetail(")
+                .append(pascalDomain).append("String id) {\n");
         sb.append("        // TODO: Detail search logic\n");
         sb.append("        return null;\n");
         sb.append("    }\n");

@@ -14,7 +14,10 @@ public class MapStructMapperGenerator {
     public static String generate(EntityMetadata meta) {
         DefaultConfig config = DefaultConfigFileHandler.load();
         String basePackage = config.getDomainBasePackage();
-        String domain = meta.tableName().toLowerCase();
+        String entityPackage = config.getEntityBasePackage();
+        String tableName = meta.tableName().toLowerCase();
+        String domain = tableName.substring(tableName.lastIndexOf('_') + 1);
+        String pascalDomain = CaseUtils.toPascalCase(domain);
         String fullPackage = basePackage + "." + domain;
 
         String entityName = meta.baseClassName();
@@ -25,29 +28,35 @@ public class MapStructMapperGenerator {
         sb.append("package ").append(fullPackage).append(";\n\n");
 
         sb.append("import org.mapstruct.*;\n");
-        sb.append("import ").append(basePackage).append(".").append(domain).append(".").append(entityName).append(";\n");
-        sb.append("import ").append(basePackage).append(".").append(domain).append(".record.").append(entityName).append("CreateResponseRecord;\n");
-        sb.append("import ").append(basePackage).append(".").append(domain).append(".record.").append(entityName).append("UpdateResponseRecord;\n");
-        sb.append("import ").append(basePackage).append(".").append(domain).append(".record.").append(entityName).append("SearchResponseRecord;\n");
-        sb.append("import ").append(basePackage).append(".").append(domain).append(".record.").append(entityName).append("UpdateRequestRecord;\n\n");
+        sb.append("import ").append(entityPackage).append(".").append(CaseUtils.toUppercaseFirstLetter(tableName)).append(";\n");
+        sb.append("import ").append(basePackage).append(".").append(domain).append(".record.").append(pascalDomain).append("CreateResponseRecord;\n");
+        sb.append("import ").append(basePackage).append(".").append(domain).append(".record.").append(pascalDomain).append("ModifyResponseRecord;\n");
+        sb.append("import ").append(basePackage).append(".").append(domain).append(".record.").append(pascalDomain).append("SearchResponseRecord;\n");
+        sb.append("import ").append(basePackage).append(".").append(domain).append(".record.").append(pascalDomain).append("ModifyRequestRecord;\n\n");
 
         sb.append("import java.util.List;\n\n");
 
         sb.append("@Mapper(componentModel = \"spring\")\n");
-        sb.append("public interface ").append(entityName).append("Mapper {\n\n");
+        sb.append("public interface ").append(pascalDomain).append("Mapper {\n\n");
 
-        sb.append("    ").append(entityName).append("SearchResponseRecord toSearchResponse(").append(entityName).append(" ").append(entityVar).append(");\n\n");
-        sb.append("    List<").append(entityName).append("SearchResponseRecord> toSearchResponseList(List<")
-                .append(entityName).append("> ").append(entityVar).append("List);\n\n");
+        sb.append("    ").append(pascalDomain).append("SearchResponseRecord toSearchResponse(")
+                .append(CaseUtils.toUppercaseFirstLetter(tableName))
+                .append(" entity").append(");\n\n");
+        sb.append("    List<").append(pascalDomain).append("SearchResponseRecord> toSearchResponseList(List<")
+                .append(CaseUtils.toUppercaseFirstLetter(tableName)).append("> entityList);\n\n");
 
-        sb.append("    ").append(entityName).append("CreateResponseRecord toCreateResponse(").append(entityName).append(" ").append(entityVar).append(");\n\n");
+        sb.append("    ").append(pascalDomain).append("CreateResponseRecord toCreateResponse(")
+                .append(CaseUtils.toUppercaseFirstLetter(tableName))
+                .append(" entity").append(");\n\n");
 
-        sb.append("    ").append(entityName).append("UpdateResponseRecord toUpdateResponse(").append(entityName).append(" ").append(entityVar).append(");\n\n");
+        sb.append("    ").append(pascalDomain).append("UpdateResponseRecord toUpdateResponse(")
+                .append(CaseUtils.toUppercaseFirstLetter(tableName))
+                .append(" entity").append(");\n\n");
 
         sb.append("    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)\n");
-        sb.append("    ").append(entityName).append(" updateFromRequest(")
-                .append(entityName).append("UpdateRequestRecord request, @MappingTarget ")
-                .append(entityName).append(" ").append(entityVar).append(");\n\n");
+        sb.append("    ").append(pascalDomain).append(" updateFromRequest(")
+                .append(pascalDomain).append("ModifyRequestRecord request, @MappingTarget ")
+                .append(CaseUtils.toUppercaseFirstLetter(tableName)).append(" entity").append(");\n\n");
 
         sb.append("}\n");
 

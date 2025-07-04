@@ -13,11 +13,12 @@ public class ControllerGenerator {
 
         String domainBasePackage = config.getDomainBasePackage();
         String basePackage = domainBasePackage.replace(".domain", "");
-        String domain = meta.tableName().toLowerCase();
+        String tableName = meta.tableName().toLowerCase();
+        String domain = tableName.substring(tableName.lastIndexOf('_') + 1);
+        String pascalDomain = CaseUtils.toPascalCase(domain);
         String fullPackage = domainBasePackage + "." + domain;
 
         String entityName = meta.baseClassName();
-        String entityNameLower = CaseUtils.toCamelCase(entityName);
 
         StringBuilder sb = new StringBuilder();
 
@@ -29,15 +30,16 @@ public class ControllerGenerator {
         sb.append("import org.springframework.http.ResponseEntity;\n");
         sb.append("import ").append(basePackage).append(".common.response").append(".ItemResponse;\n");
         sb.append("import ").append(basePackage).append(".common.response").append(".ItemsResponse;\n");
-        sb.append("import ").append(fullPackage).append(".record.").append(entityName).append("CreateRequestRecord;\n");
-        sb.append("import ").append(fullPackage).append(".record.").append(entityName).append("CreateResponseRecord;\n");
-        sb.append("import ").append(fullPackage).append(".record.").append(entityName).append("UpdateRequestRecord;\n");
-        sb.append("import ").append(fullPackage).append(".record.").append(entityName).append("UpdateResponseRecord;\n");
-        sb.append("import ").append(fullPackage).append(".record.").append(entityName).append("DeleteRequestRecord;\n");
-        sb.append("import ").append(fullPackage).append(".record.").append(entityName).append("DeleteResponseRecord;\n");
-        sb.append("import ").append(fullPackage).append(".record.").append(entityName).append("SearchRequestRecord;\n");
-        sb.append("import ").append(fullPackage).append(".record.").append(entityName).append("SearchResponseRecord;\n");
-        sb.append("import ").append(fullPackage).append(".").append(entityName).append("Service;\n");
+        sb.append("import ").append(fullPackage).append(".record.").append(pascalDomain).append("CreateRequestRecord;\n");
+        sb.append("import ").append(fullPackage).append(".record.").append(pascalDomain).append("CreateResponseRecord;\n");
+        sb.append("import ").append(fullPackage).append(".record.").append(pascalDomain).append("UpdateRequestRecord;\n");
+        sb.append("import ").append(fullPackage).append(".record.").append(pascalDomain).append("UpdateResponseRecord;\n");
+        sb.append("import ").append(fullPackage).append(".record.").append(pascalDomain).append("DeleteRequestRecord;\n");
+        sb.append("import ").append(fullPackage).append(".record.").append(pascalDomain).append("DeleteResponseRecord;\n");
+        sb.append("import ").append(fullPackage).append(".record.").append(pascalDomain).append("SearchRequestRecord;\n");
+        sb.append("import ").append(fullPackage).append(".record.").append(pascalDomain).append("SearchResponseRecord;\n");
+        sb.append("import org.springframework.web.bind.annotation.*;\n");
+        sb.append("import ").append(fullPackage).append(".").append(pascalDomain).append("Service;\n");
 
         if (useSwagger) {
             sb.append("import io.swagger.v3.oas.annotations.Operation;\n");
@@ -47,88 +49,107 @@ public class ControllerGenerator {
         sb.append("import java.util.List;\n\n");
 
         if (useSwagger) {
-            sb.append("@Tag(name = \"").append(entityName).append("\")\n");
+            sb.append("@Tag(name = \"").append(pascalDomain).append("\")\n");
         }
         sb.append("@RestController\n");
         sb.append("@RequestMapping(\"/api/").append(domain).append("\")\n");
         sb.append("@RequiredArgsConstructor\n");
-        sb.append("public class ").append(entityName).append("Controller {\n\n");
+        sb.append("public class ").append(pascalDomain).append("Controller {\n\n");
 
-        sb.append("    private final ").append(entityName).append("Service ").append(entityNameLower).append("Service;\n\n");
+        sb.append("    private final ").append(pascalDomain).append("Service ").append(domain).append("Service;\n\n");
 
         // Create
         if (useSwagger) {
-            sb.append("    @Operation(summary = \"").append(entityName).append(" 생성\", description = \"")
-                    .append(entityName).append(" 정보를 생성합니다.\")\n");
+            sb.append("    @Operation(summary = \"").append(pascalDomain).append(" 생성\", description = \"")
+                    .append(pascalDomain).append(" 정보를 생성합니다.\")\n");
         }
-        sb.append("    @PostMapping\n");
-        sb.append("    public ResponseEntity<").append(entityName)
-                .append("CreateResponseRecord> create(\n            @RequestBody @Valid ")
-                .append(entityName).append("CreateRequestRecord request) {\n");
-        sb.append("        return ResponseEntity.ok(").append(entityNameLower).append("Service.create(request));\n");
+        sb.append("    @PostMapping(\"/create\")\n");
+        sb.append("    public ResponseEntity<").append("ItemResponse<").append(pascalDomain)
+                .append("CreateResponseRecord>> create(\n            @RequestBody @Valid ")
+                .append(pascalDomain).append("CreateRequestRecord request) {\n");
+        sb.append("        return ResponseEntity.ok()\n")
+                .append("               .body(ItemResponse.<").append(pascalDomain)
+                .append("CreateResponseRecord>builder()\n")
+                .append("                       .status(\"OK\")\n")
+                .append("                       .message(\"정보를 생성하였습니다.\")\n")
+                .append("                       .item(")
+                .append(domain).append("Service.create(request))\n")
+                .append("                       .build());\n");
         sb.append("    }\n\n");
 
-        // Update
+        // Modify
         if (useSwagger) {
-            sb.append("    @Operation(summary = \"").append(entityName).append(" 수정\", description = \"")
-                    .append(entityName).append(" 정보를 수정합니다.\")\n");
+            sb.append("    @Operation(summary = \"").append(pascalDomain).append(" 수정\", description = \"")
+                    .append(pascalDomain).append(" 정보를 수정합니다.\")\n");
         }
-        sb.append("    @PutMapping\n");
-        sb.append("    public ResponseEntity<").append(entityName)
-                .append("UpdateResponseRecord> update(\n            @RequestBody @Valid ")
-                .append(entityName).append("UpdateRequestRecord request) {\n");
-        sb.append("        return ResponseEntity.ok(").append(entityNameLower).append("Service.update(request));\n");
+        sb.append("    @PostMapping(\"/modify\")\n");
+        sb.append("    public ResponseEntity<").append("ItemResponse<").append(pascalDomain)
+                .append("ModifyResponseRecord>> modify(\n            @RequestBody @Valid ")
+                .append(pascalDomain).append("ModifyRequestRecord request) {\n");
+        sb.append("        return ResponseEntity.ok()\n")
+                .append("               .body(ItemResponse.<").append(pascalDomain)
+                .append("ModifyResponseRecord>builder()\n")
+                .append("                       .status(\"OK\")\n")
+                .append("                       .message(\"정보를 수정하였습니다.\")\n")
+                .append("                       .item(")
+                .append(domain).append("Service.modify(request))\n")
+                .append("                       .build());\n");
         sb.append("    }\n\n");
 
         // Delete
         if (useSwagger) {
-            sb.append("    @Operation(summary = \"").append(entityName).append(" 삭제\", description = \"")
-                    .append(entityName).append(" 정보를 삭제합니다.\")\n");
+            sb.append("    @Operation(summary = \"").append(pascalDomain).append(" 삭제\", description = \"")
+                    .append(pascalDomain).append(" 정보를 삭제합니다.\")\n");
         }
         sb.append("    @PostMapping(\"/delete\")\n");
-        sb.append("    public ResponseEntity<").append(entityName)
-                .append("DeleteResponseRecord> delete(\n            @RequestBody @Valid ")
-                .append(entityName).append("DeleteRequestRecord request) {\n");
-        sb.append("        return ResponseEntity.ok(").append(entityNameLower).append("Service.delete(request));\n");
+        sb.append("    public ResponseEntity<").append("ItemResponse<").append(pascalDomain)
+                .append("DeleteResponseRecord>> delete(\n            @RequestBody @Valid ")
+                .append(pascalDomain).append("DeleteRequestRecord request) {\n");
+        sb.append("        return ResponseEntity.ok()\n")
+                .append("               .body(ItemResponse.<").append(pascalDomain)
+                .append("DeleteResponseRecord>builder()\n")
+                .append("                       .status(\"OK\")\n")
+                .append("                       .message(\"정보를 삭제하였습니다.\")\n")
+                .append("                       .item(")
+                .append(domain).append("Service.delete(request))\n")
+                .append("                       .build());\n");
         sb.append("    }\n\n");
 
         // List Search
         if (useSwagger) {
-            sb.append("    @Operation(summary = \"").append(entityName).append(" 목록 조회\", description = \"")
-                    .append(entityName).append(" 목록을 조회합니다.\")\n");
+            sb.append("    @Operation(summary = \"").append(pascalDomain).append(" 목록 조회\", description = \"")
+                    .append(pascalDomain).append(" 목록을 조회합니다.\")\n");
         }
-        sb.append("    @GetMapping\n");
-        sb.append("    public ResponseEntity<ItemsResponse<").append(entityName)
-                .append("SearchResponseRecord>> listSearch(\n            @ModelAttribute @Valid ")
-                .append(entityName).append("SearchRequestRecord request) {\n");
-        sb.append("        List<").append(entityName).append("SearchResponseRecord> list = ")
-                .append(entityNameLower).append("Service.listSearch(request);\n");
+        sb.append("    @GetMapping(\"/").append(domain).append("s\")\n");
+        sb.append("    public ResponseEntity<ItemsResponse<").append(pascalDomain)
+                .append("SearchResponseRecord>> searchList(\n            @ModelAttribute @Valid ")
+                .append(pascalDomain).append("SearchRequestRecord request) {\n");
+        sb.append("        List<").append(pascalDomain).append("SearchResponseRecord> list = ")
+                .append(pascalDomain).append("Service.searchList(request);\n");
         sb.append("        return ResponseEntity\n");
         sb.append("                 .ok()\n");
-        sb.append("                 .body(ItemsResponse.<").append(entityName).append("SearchResponseRecord>builder()\n");
+        sb.append("                 .body(ItemsResponse.<").append(pascalDomain).append("SearchResponseRecord>builder()\n");
         sb.append("                         .status(\"OK\")\n");
         sb.append("                         .message(\"데이터 목록을 조회하는데 성공하였습니다.\")\n");
         sb.append("                         .totalSize((long) list.size())\n");
         sb.append("                         .items(list)\n");
         sb.append("                         .build());\n");
-        sb.append("    }\n");
-
-        sb.append("}\n");
+        sb.append("    }\n\n");
 
         // single Search
         if (useSwagger) {
-            sb.append("    @Operation(summary = \"").append(entityName).append(" 상세 조회\", description = \"")
-                    .append(entityName).append(" 상세 조회합니다.\")\n");
+            sb.append("    @Operation(summary = \"").append(pascalDomain).append(" 상세 조회\", description = \"")
+                    .append(pascalDomain).append(" 상세 정보를 조회합니다.\")\n");
         }
-        sb.append("    @GetMapping\n");
-        sb.append("    public ResponseEntity<ItemResponse<").append(entityName)
-                .append("SearchResponseRecord>> detailSearch(\n            @ModelAttribute @Valid ")
-                .append(entityName).append("SearchRequestRecord request) {\n");
-        sb.append("        ").append(entityName).append("SearchResponseRecord> data = ")
-                .append(entityNameLower).append("Service.detailSearch(request);\n");
+        sb.append("    @GetMapping(\"/").append(domain).append("s/{id}\")\n");
+        sb.append("    public ResponseEntity<ItemResponse<").append(pascalDomain)
+                .append("SearchResponseRecord>> searchDetail(\n            @PathVariable ")
+                .append("String id) {\n");
+        sb.append("        ").append(pascalDomain).append("SearchResponseRecord data = ")
+                .append(pascalDomain).append("Service.searchDetail(id);\n");
         sb.append("        return ResponseEntity\n");
         sb.append("                 .ok()\n");
-        sb.append("                 .body(ItemResponse.<").append(entityName).append("SearchResponseRecord>builder()\n");
+        sb.append("                 .body(ItemResponse.<").append(pascalDomain).append("SearchResponseRecord>builder()\n");
         sb.append("                         .status(\"OK\")\n");
         sb.append("                         .message(\"상세 데이터를 조회하는데 성공하였습니다.\")\n");
         sb.append("                         .item(data)\n");

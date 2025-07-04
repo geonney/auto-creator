@@ -26,20 +26,20 @@ public class RecordGenerator {
     ) {
         try {
             List<FieldMetadata> fields = DatabaseMetaReader.readTableFields(schema, tableName, databaseType);
-            System.out.println(fields);
 
             // ✅ mode 분리
             boolean isRequest = mode.endsWith("-request");
             String action = mode.split("-")[0]; // "create", "update", "delete", "search"
-
-            String recordName = baseClassName + CaseUtils.toPascalCase(action) + (isRequest ? "RequestRecord" : "ResponseRecord");
+            String domainName = baseClassName.substring(baseClassName.lastIndexOf('_') + 1);
+            String recordName = CaseUtils.toPascalCase(domainName) + CaseUtils.toPascalCase(action) +
+                    (isRequest ? "RequestRecord" : "ResponseRecord");
 
             // ✅ 필드 필터링
             List<FieldMetadata> selectedFields = switch (action.toLowerCase()) {
                 case "create" -> fields.stream()
                         .filter(f -> !isRequest || !f.primaryKey()) // Create-Request 는 PK 제외
                         .toList();
-                case "update", "search" -> fields;
+                case "modify", "search" -> fields;
                 case "delete" -> fields.stream()
                         .filter(FieldMetadata::primaryKey)
                         .toList();
@@ -66,7 +66,7 @@ public class RecordGenerator {
 
             if (useSwagger) {
                 sb.append("@Schema(description = \"")
-                        .append(tableName).append(" ").append(CaseUtils.toPascalCase(action))
+                        .append(CaseUtils.toPascalCase(domainName)).append(" ").append(CaseUtils.toPascalCase(action))
                         .append(isRequest ? " Request" : " Response")
                         .append(" Record\")\n");
             }

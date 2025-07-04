@@ -140,7 +140,7 @@ public class CodeGeneratorPanel extends JPanel {
 
         List<String> recordTypes = List.of(
                 "Create Request", "Create Response",
-                "Update Request", "Update Response",
+                "Modify Request", "Modify Response",
                 "Delete Request", "Delete Response",
                 "Search Request", "Search Response"
         );
@@ -178,8 +178,8 @@ public class CodeGeneratorPanel extends JPanel {
                 currentCodeType = switch (mode) {
                     case "create-request" -> CodeType.RECORD_CREATE_REQUEST;
                     case "create-response" -> CodeType.RECORD_CREATE_RESPONSE;
-                    case "update-request" -> CodeType.RECORD_UPDATE_REQUEST;
-                    case "update-response" -> CodeType.RECORD_UPDATE_RESPONSE;
+                    case "modify-request" -> CodeType.RECORD_MODIFY_REQUEST;
+                    case "modify-response" -> CodeType.RECORD_MODIFY_RESPONSE;
                     case "delete-request" -> CodeType.RECORD_DELETE_REQUEST;
                     case "delete-response" -> CodeType.RECORD_DELETE_RESPONSE;
                     case "search-request" -> CodeType.RECORD_SEARCH_REQUEST;
@@ -336,8 +336,8 @@ public class CodeGeneratorPanel extends JPanel {
         String defaultName = switch (currentCodeType) {
             case RECORD_CREATE_REQUEST -> classNameField.getText().trim() + "CreateRequestRecord.java";
             case RECORD_CREATE_RESPONSE -> classNameField.getText().trim() + "CreateResponseRecord.java";
-            case RECORD_UPDATE_REQUEST -> classNameField.getText().trim() + "UpdateRequestRecord.java";
-            case RECORD_UPDATE_RESPONSE -> classNameField.getText().trim() + "UpdateResponseRecord.java";
+            case RECORD_MODIFY_REQUEST -> classNameField.getText().trim() + "ModifyRequestRecord.java";
+            case RECORD_MODIFY_RESPONSE -> classNameField.getText().trim() + "ModifyResponseRecord.java";
             case RECORD_DELETE_REQUEST -> classNameField.getText().trim() + "DeleteRequestRecord.java";
             case RECORD_DELETE_RESPONSE -> classNameField.getText().trim() + "DeleteResponseRecord.java";
             case RECORD_SEARCH_REQUEST -> classNameField.getText().trim() + "SearchRequestRecord.java";
