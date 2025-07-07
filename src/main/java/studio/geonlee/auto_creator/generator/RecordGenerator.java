@@ -49,7 +49,7 @@ public class RecordGenerator {
             DefaultConfig config = DefaultConfigFileHandler.load();
             boolean useSwagger = config.isUseSwagger();
             String basePackage = config.getDomainBasePackage();
-            String recordPackage = basePackage + "." + tableName.toLowerCase() + ".record";
+            String recordPackage = basePackage + "." + domainName + ".record";
 
             StringBuilder sb = new StringBuilder();
             sb.append("package ").append(recordPackage).append(";").append("\n\n");

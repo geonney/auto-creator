@@ -17,6 +17,7 @@ public class RepositoryGenerator {
     public static String generate(EntityMetadata meta) {
         DefaultConfig config = DefaultConfigFileHandler.load();
         String basePackage = config.getDomainBasePackage();
+        String entityBasePackage = config.getEntityBasePackage();
         String tableName = meta.tableName().toLowerCase();
         String domain = tableName.substring(tableName.lastIndexOf('_') + 1);
         String pascalDomain = CaseUtils.toPascalCase(domain);
@@ -33,19 +34,27 @@ public class RepositoryGenerator {
         if (pkFields.size() == 1) {
             pkType = pkFields.get(0).javaType(); // 단일 PK 타입 그대로
         } else {
-            pkType = entityName + "Id"; // 복합키: 엔티티명 + "Id"
+            pkType = tableName + "Id"; // 복합키: 엔티티명 + "Id"
         }
 
         StringBuilder sb = new StringBuilder();
         sb.append("package ").append(fullPackage).append(";\n\n");
 
         sb.append("import org.springframework.data.jpa.repository.JpaRepository;\n");
-        sb.append("import org.springframework.stereotype.Repository;\n\n");
+        sb.append("import org.springframework.stereotype.Repository;\n");
+        sb.append("import ").append(entityBasePackage).append(".").append(CaseUtils.toUppercaseFirstLetter(tableName))
+                .append(";\n");
+        if (pkFields.size() > 1) {
+            sb.append("import ").append(entityBasePackage).append(".embeddedId").append(".")
+                    .append(CaseUtils.toUppercaseFirstLetter(pkType)).append(";\n");
+        }
+        sb.append("\n");
 
         sb.append("@Repository\n");
         sb.append("public interface ").append((pascalDomain))
                 .append("Repository extends JpaRepository<")
-                .append(CaseUtils.toUppercaseFirstLetter(tableName)).append(", ").append(pkType).append("> {\n");
+                .append(CaseUtils.toUppercaseFirstLetter(tableName)).append(", ")
+                .append(CaseUtils.toUppercaseFirstLetter(pkType)).append("> {\n");
         sb.append("}\n");
 
         return sb.toString();

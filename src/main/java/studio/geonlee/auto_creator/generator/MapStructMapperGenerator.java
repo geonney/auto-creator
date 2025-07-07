@@ -20,9 +20,6 @@ public class MapStructMapperGenerator {
         String pascalDomain = CaseUtils.toPascalCase(domain);
         String fullPackage = basePackage + "." + domain;
 
-        String entityName = meta.baseClassName();
-        String entityVar = CaseUtils.toCamelCase(entityName);
-
         StringBuilder sb = new StringBuilder();
 
         sb.append("package ").append(fullPackage).append(";\n\n");
@@ -54,7 +51,7 @@ public class MapStructMapperGenerator {
                 .append(" entity").append(");\n\n");
 
         sb.append("    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)\n");
-        sb.append("    ").append(pascalDomain).append(" updateFromRequest(")
+        sb.append("    ").append(CaseUtils.toUppercaseFirstLetter(tableName)).append(" updateFromRequest(")
                 .append(pascalDomain).append("ModifyRequestRecord request, @MappingTarget ")
                 .append(CaseUtils.toUppercaseFirstLetter(tableName)).append(" entity").append(");\n\n");
 

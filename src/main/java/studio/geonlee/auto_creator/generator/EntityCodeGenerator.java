@@ -31,6 +31,7 @@ public class EntityCodeGenerator {
             sb.append("package ").append(entityBasePackage).append(";").append("\n\n");
             sb.append("import jakarta.persistence.*;\n");
             sb.append("import lombok.Getter;\n");
+            sb.append("import lombok.NoArgsConstructor;\n");
             sb.append("import java.time.*;\n\n");
             boolean usesBigDecimal = fields.stream()
                     .anyMatch(f -> f.javaType().equals("BigDecimal"));
@@ -39,7 +40,7 @@ public class EntityCodeGenerator {
                 sb.append("import java.math.BigDecimal;\n");
             }
 
-            sb.append("@Getter\n@Entity\n");
+            sb.append("@Getter\n@Entity\n@NoArgsConstructor\n");
             sb.append("@Table(name = \"").append(tableName).append("\")\n");
             sb.append("public class ").append(className).append(" {\n\n");
 
