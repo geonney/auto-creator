@@ -28,12 +28,15 @@ public class ControllerGenerator {
         sb.append("import jakarta.validation.Valid;\n");
         sb.append("import org.springframework.web.bind.annotation.*;\n");
         sb.append("import org.springframework.http.ResponseEntity;\n");
+        sb.append("import org.springframework.data.domain.Page;\n");
+        sb.append("import org.springframework.data.domain.Pageable;\n");
         sb.append("import ").append(basePackage).append(".common.response").append(".ItemResponse;\n");
         sb.append("import ").append(basePackage).append(".common.response").append(".ItemsResponse;\n");
+        sb.append("import ").append(basePackage).append(".common.response").append(".GridResponse;\n");
         sb.append("import ").append(fullPackage).append(".record.").append(pascalDomain).append("CreateRequestRecord;\n");
         sb.append("import ").append(fullPackage).append(".record.").append(pascalDomain).append("CreateResponseRecord;\n");
-        sb.append("import ").append(fullPackage).append(".record.").append(pascalDomain).append("UpdateRequestRecord;\n");
-        sb.append("import ").append(fullPackage).append(".record.").append(pascalDomain).append("UpdateResponseRecord;\n");
+        sb.append("import ").append(fullPackage).append(".record.").append(pascalDomain).append("ModifyRequestRecord;\n");
+        sb.append("import ").append(fullPackage).append(".record.").append(pascalDomain).append("ModifyResponseRecord;\n");
         sb.append("import ").append(fullPackage).append(".record.").append(pascalDomain).append("DeleteRequestRecord;\n");
         sb.append("import ").append(fullPackage).append(".record.").append(pascalDomain).append("DeleteResponseRecord;\n");
         sb.append("import ").append(fullPackage).append(".record.").append(pascalDomain).append("SearchRequestRecord;\n");
@@ -136,7 +139,7 @@ public class ControllerGenerator {
         sb.append("                         .build());\n");
         sb.append("    }\n\n");
 
-        // single Search
+        // Detail Search
         if (useSwagger) {
             sb.append("    @Operation(summary = \"").append(pascalDomain).append(" 상세 조회\", description = \"")
                     .append(pascalDomain).append(" 상세 정보를 조회합니다.\")\n");
@@ -153,6 +156,29 @@ public class ControllerGenerator {
         sb.append("                         .status(\"OK\")\n");
         sb.append("                         .message(\"상세 데이터를 조회하는데 성공하였습니다.\")\n");
         sb.append("                         .item(data)\n");
+        sb.append("                         .build());\n");
+        sb.append("    }\n\n");
+
+        // Grid Search
+        if (useSwagger) {
+            sb.append("    @Operation(summary = \"").append(pascalDomain).append(" 그리드 목록 조회\", description = \"")
+                    .append(pascalDomain).append(" 그리드 목록 정보를 조회합니다.\")\n");
+        }
+        sb.append("    @GetMapping(\"/").append(domain).append("s/grid\")\n");
+        sb.append("    public ResponseEntity<GridResponse<").append(pascalDomain)
+                .append("SearchResponseRecord>> searchGrid(\n            @ModelAttribute @Valid ")
+                .append(pascalDomain).append("SearchRequestRecord request,\n")
+                .append("            @ParameterObject @PageableDefault(size = 10) Pageable pageable) {\n");
+        sb.append("        Page<").append(pascalDomain).append("SearchResponseRecord> page = ")
+                .append(domain).append("Service.searchGrid(request, pageable);\n");
+        sb.append("        return ResponseEntity\n");
+        sb.append("                 .ok()\n");
+        sb.append("                 .body(GridResponse.<").append(pascalDomain).append("SearchResponseRecord>builder()\n");
+        sb.append("                         .status(\"OK\")\n");
+        sb.append("                         .message(\"그리드 목록 데이터를 조회하는데 성공하였습니다.\")\n");
+        sb.append("                         .totalSize(page.getTotalElements())\n");
+        sb.append("                         .size(page.getNumberOfElements())\n");
+        sb.append("                         .items(page.getContent())\n");
         sb.append("                         .build());\n");
         sb.append("    }\n");
 

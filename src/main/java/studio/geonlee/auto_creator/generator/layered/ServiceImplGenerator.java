@@ -25,11 +25,13 @@ public class ServiceImplGenerator {
         sb.append("import lombok.RequiredArgsConstructor;\n");
         sb.append("import org.springframework.stereotype.Service;\n");
         sb.append("import java.util.List;\n");
+        sb.append("import org.springframework.data.domain.Page;\n");
+        sb.append("import org.springframework.data.domain.Pageable;\n");
         sb.append("import ").append(fullPackage).append(".").append(pascalDomain).append("Repository;\n");
         sb.append("import ").append(fullPackage).append(".record.").append(pascalDomain).append("CreateRequestRecord;\n");
         sb.append("import ").append(fullPackage).append(".record.").append(pascalDomain).append("CreateResponseRecord;\n");
-        sb.append("import ").append(fullPackage).append(".record.").append(pascalDomain).append("UpdateRequestRecord;\n");
-        sb.append("import ").append(fullPackage).append(".record.").append(pascalDomain).append("UpdateResponseRecord;\n");
+        sb.append("import ").append(fullPackage).append(".record.").append(pascalDomain).append("ModifyRequestRecord;\n");
+        sb.append("import ").append(fullPackage).append(".record.").append(pascalDomain).append("ModifyResponseRecord;\n");
         sb.append("import ").append(fullPackage).append(".record.").append(pascalDomain).append("DeleteRequestRecord;\n");
         sb.append("import ").append(fullPackage).append(".record.").append(pascalDomain).append("DeleteResponseRecord;\n");
         sb.append("import ").append(fullPackage).append(".record.").append(pascalDomain).append("SearchRequestRecord;\n");
@@ -65,7 +67,7 @@ public class ServiceImplGenerator {
         sb.append("    @Override\n");
         sb.append("    public List<").append(pascalDomain).append("SearchResponseRecord> searchList(")
                 .append(pascalDomain).append("SearchRequestRecord request) {\n");
-        sb.append("        // TODO: list search logic\n");
+        sb.append("        // TODO: List search logic\n");
         sb.append("        return List.of();\n");
         sb.append("    }\n\n");
 
@@ -74,7 +76,14 @@ public class ServiceImplGenerator {
                 .append(pascalDomain).append("String id) {\n");
         sb.append("        // TODO: Detail search logic\n");
         sb.append("        return null;\n");
-        sb.append("    }\n");
+        sb.append("    }\n\n");
+
+        sb.append("    @Override\n");
+        sb.append("    public Page<").append(pascalDomain).append("SearchResponseRecord> searchGrid(")
+                .append(pascalDomain).append("SearchRequestRecord request, Pageable pageable) {\n");
+        sb.append("        // TODO: Grid search logic\n");
+        sb.append("        return null;\n");
+        sb.append("    }\n\n");
 
         sb.append("}\n");
 

@@ -41,7 +41,6 @@ public class RepositoryGenerator {
         sb.append("package ").append(fullPackage).append(";\n\n");
 
         sb.append("import org.springframework.data.jpa.repository.JpaRepository;\n");
-        sb.append("import org.springframework.stereotype.Repository;\n");
         sb.append("import ").append(entityBasePackage).append(".").append(CaseUtils.toUppercaseFirstLetter(tableName))
                 .append(";\n");
         if (pkFields.size() > 1) {
@@ -50,7 +49,6 @@ public class RepositoryGenerator {
         }
         sb.append("\n");
 
-        sb.append("@Repository\n");
         sb.append("public interface ").append((pascalDomain))
                 .append("Repository extends JpaRepository<")
                 .append(CaseUtils.toUppercaseFirstLetter(tableName)).append(", ")

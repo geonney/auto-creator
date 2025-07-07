@@ -24,10 +24,12 @@ public class ServiceInterfaceGenerator {
         sb.append("package ").append(fullPackage).append(";\n\n");
 
         sb.append("import java.util.List;\n");
+        sb.append("import org.springframework.data.domain.Page;\n");
+        sb.append("import org.springframework.data.domain.Pageable;\n");
         sb.append("import ").append(fullPackage).append(".record.").append(pascalDomain).append("CreateRequestRecord;\n");
         sb.append("import ").append(fullPackage).append(".record.").append(pascalDomain).append("CreateResponseRecord;\n");
-        sb.append("import ").append(fullPackage).append(".record.").append(pascalDomain).append("UpdateRequestRecord;\n");
-        sb.append("import ").append(fullPackage).append(".record.").append(pascalDomain).append("UpdateResponseRecord;\n");
+        sb.append("import ").append(fullPackage).append(".record.").append(pascalDomain).append("ModifyRequestRecord;\n");
+        sb.append("import ").append(fullPackage).append(".record.").append(pascalDomain).append("ModifyResponseRecord;\n");
         sb.append("import ").append(fullPackage).append(".record.").append(pascalDomain).append("DeleteRequestRecord;\n");
         sb.append("import ").append(fullPackage).append(".record.").append(pascalDomain).append("DeleteResponseRecord;\n");
         sb.append("import ").append(fullPackage).append(".record.").append(pascalDomain).append("SearchRequestRecord;\n");
@@ -50,6 +52,10 @@ public class ServiceInterfaceGenerator {
         // List search
         sb.append("    List<").append(pascalDomain).append("SearchResponseRecord> searchList(")
                 .append(pascalDomain).append("SearchRequestRecord request);\n\n");
+
+        // Grid search
+        sb.append("    Page<").append(pascalDomain).append("SearchResponseRecord> searchGrid(")
+                .append(pascalDomain).append("SearchRequestRecord request, Pageable pageable);\n\n");
 
         // Detail search
         sb.append("    ").append(pascalDomain).append("SearchResponseRecord searchDetail(")
