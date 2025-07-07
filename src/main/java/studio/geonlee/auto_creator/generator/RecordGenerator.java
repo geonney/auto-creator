@@ -60,11 +60,12 @@ public class RecordGenerator {
             if (needsValidation) {
                 sb.append("import jakarta.validation.constraints.*;\n\n");
             }
+            if (hasTime(selectedFields)) {
+                sb.append("import java.time.*;\n");
+                sb.append("import com.fasterxml.jackson.annotation.JsonFormat;\n");
+            }
             if (useSwagger) {
                 sb.append("import io.swagger.v3.oas.annotations.media.Schema;\n\n");
-            }
-
-            if (useSwagger) {
                 sb.append("@Schema(description = \"")
                         .append(CaseUtils.toPascalCase(domainName)).append(" ").append(CaseUtils.toPascalCase(action))
                         .append(isRequest ? " Request" : " Response")
@@ -100,6 +101,14 @@ public class RecordGenerator {
                             .append("\")\n");
                 }
 
+                if(!isRequest) {
+                    if("LocalDate".equals(fieldType)) {
+                        sb.append("    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = \"yyyy-MM-dd\")\n");
+                    } else if ("LocalDateTime".equals(fieldType)) {
+                        sb.append("    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = \"yyyy-MM-dd HH:mm:ss\")\n");
+                    }
+                }
+
                 sb.append("    ").append(fieldType).append(" ").append(field.fieldName());
                 sb.append(i < selectedFields.size() - 1 ? ",\n\n" : "\n");
             }
@@ -116,6 +125,7 @@ public class RecordGenerator {
 
     /**
      * Request 일 때는 LocalDate/LocalDateTime을 String으로 변환
+     * -> 2025-07-07
      */
     private static String convertFieldType(String javaType, boolean isRequest) {
         if (isRequest) {
@@ -133,12 +143,23 @@ public class RecordGenerator {
      */
     private static String generateExample(String fieldType) {
         String type = fieldType.toLowerCase();
-        if (type.contains("string")) return "sample text";
-        if (type.contains("int") || type.contains("long")) return "1";
-        if (type.contains("boolean")) return "true";
-        if (type.contains("localdate")) return "2025-04-29";
-        if (type.contains("localdatetime") || type.contains("time")) return "2025-04-29 00:00:00";
-        if (type.contains("bigdecimal") || type.contains("double") || type.contains("float")) return "12345.67";
+
+        if ("string".equals(type)) return "sample text";
+        if (type.contains("int") || "long".equals(type)) return "1";
+        if ("boolean".equals(type)) return "true";
+        if ("localdate".equals(type)) return "2025-04-29";
+        if ("localdatetime".equals(type) || "time".equals(type)) return "2025-04-29 00:00:00";
+        if ("bigdecimal".equals(type) || "double".equals(type) || "float".equals(type)) return "12345.67";
         return "sample";
+    }
+
+    private static boolean hasTime(List<FieldMetadata> selectedFields) {
+
+        for (FieldMetadata field : selectedFields) {
+            if(field.javaType().contains("LocalDate")){
+                return true;
+            }
+        }
+        return false;
     }
 }
