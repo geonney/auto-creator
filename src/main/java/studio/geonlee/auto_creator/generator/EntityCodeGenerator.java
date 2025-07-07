@@ -32,6 +32,7 @@ public class EntityCodeGenerator {
             sb.append("import jakarta.persistence.*;\n");
             sb.append("import lombok.Getter;\n");
             sb.append("import lombok.NoArgsConstructor;\n");
+            sb.append("import lombok.AllArgsConstructor;\n");
             sb.append("import java.time.*;\n\n");
             boolean usesBigDecimal = fields.stream()
                     .anyMatch(f -> f.javaType().equals("BigDecimal"));
@@ -40,7 +41,7 @@ public class EntityCodeGenerator {
                 sb.append("import java.math.BigDecimal;\n");
             }
 
-            sb.append("@Getter\n@Entity\n@NoArgsConstructor\n");
+            sb.append("@Getter\n@Entity\n@NoArgsConstructor\n@AllArgsConstructor\n");
             sb.append("@Table(name = \"").append(tableName).append("\")\n");
             sb.append("public class ").append(className).append(" {\n\n");
 
@@ -112,7 +113,7 @@ public class EntityCodeGenerator {
     private static String generateEmbeddedId(String className, List<FieldMetadata> pkFields) {
         StringBuilder sb = new StringBuilder();
 
-        sb.append("@Getter\n@EqualsAndHashCode\n@Embeddable\n");
+        sb.append("@Getter\n@EqualsAndHashCode\n@Embeddable\n@NoArgsConstructor\n@AllArgsConstructor\n");
         sb.append("public class ").append(className).append(" {\n\n");
 
         for (FieldMetadata field : pkFields) {
