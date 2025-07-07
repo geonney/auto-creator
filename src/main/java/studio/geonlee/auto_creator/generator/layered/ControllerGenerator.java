@@ -177,6 +177,7 @@ public class ControllerGenerator {
         sb.append("                         .status(\"OK\")\n");
         sb.append("                         .message(\"그리드 목록 데이터를 조회하는데 성공하였습니다.\")\n");
         sb.append("                         .totalSize(page.getTotalElements())\n");
+        sb.append("                         .totalPageSize(page.getTotalPages())\n");
         sb.append("                         .size(page.getNumberOfElements())\n");
         sb.append("                         .items(page.getContent())\n");
         sb.append("                         .build());\n");
