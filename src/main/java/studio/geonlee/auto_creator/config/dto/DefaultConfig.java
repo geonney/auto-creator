@@ -22,6 +22,7 @@ public class DefaultConfig {
     private boolean expandTree;
     private boolean useSwagger;
     private boolean useMapStruct;
+    private boolean useQueryDsl;
     private String language;
     private String architecture;
     private String orm;

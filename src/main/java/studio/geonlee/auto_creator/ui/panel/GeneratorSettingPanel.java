@@ -20,6 +20,7 @@ public class GeneratorSettingPanel extends JPanel {
     private final JComboBox<String> ormComboBox;
     private final JCheckBox useSwaggerCheck = new JCheckBox(MessageUtil.get("checkbox.swagger.annotation"));
     private final JCheckBox useMapStructCheck = new JCheckBox(MessageUtil.get("checkbox.mapStruct"));
+    private final JCheckBox useQueryDslCheck = new JCheckBox(MessageUtil.get("checkbox.querydsl"));
     private final MainFrame mainFrame;
 
     public GeneratorSettingPanel(MainFrame mainFrame) {
@@ -53,8 +54,13 @@ public class GeneratorSettingPanel extends JPanel {
         useSwaggerCheck.setAlignmentX(Component.LEFT_ALIGNMENT);
         add(useSwaggerCheck);
 
+        // mapstruct 사용 여부 체크박스
         useMapStructCheck.setAlignmentX(Component.LEFT_ALIGNMENT);
         add(useMapStructCheck);
+
+        // querydsl 사용 여부 체크박스
+        useQueryDslCheck.setAlignmentX(Component.LEFT_ALIGNMENT);
+        add(useQueryDslCheck);
 
         JButton saveBtn = new JButton(MessageUtil.get("button.save"));
         saveBtn.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -102,6 +108,7 @@ public class GeneratorSettingPanel extends JPanel {
                     : CaseUtils.toUppercaseFirstLetter(config.getOrm())));
             useSwaggerCheck.setSelected(config.isUseSwagger());
             useMapStructCheck.setSelected(config.isUseMapStruct());
+            useQueryDslCheck.setSelected(config.isUseQueryDsl());
         }
     }
 
@@ -114,6 +121,7 @@ public class GeneratorSettingPanel extends JPanel {
             config.setOrm(String.valueOf(ormComboBox.getSelectedItem()).toLowerCase());
             config.setUseSwagger(useSwaggerCheck.isSelected());
             config.setUseMapStruct(useMapStructCheck.isSelected());
+            config.setUseQueryDsl(useQueryDslCheck.isSelected());
 
             DefaultConfigFileHandler.save(config);
 

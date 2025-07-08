@@ -270,6 +270,8 @@ public class CodeGeneratorPanel extends JPanel {
             case "Service Interface" -> ServiceInterfaceGenerator.generate(entityMeta);
             case "Service Impl" -> ServiceImplGenerator.generate(entityMeta);
             case "Repository" -> RepositoryGenerator.generate(entityMeta);
+            case "QueryDsl Repository" -> QueryDslRepositoryGenerator.generate(entityMeta);
+            case "QueryDsl Repository Impl" -> QueryDslRepositoryImplGenerator.generate(entityMeta);
             case "MapStruct Mapper" -> MapStructMapperGenerator.generate(entityMeta);
             case "Mapper" -> MapperGenerator.generate(entityMeta);
             case "Query xml" -> MybatisXmlGenerator.generate(entityMeta);
@@ -283,6 +285,8 @@ public class CodeGeneratorPanel extends JPanel {
             case "Service Interface" -> CodeType.SERVICE_INTERFACE;
             case "Service Impl" -> CodeType.SERVICE_IMPL;
             case "Repository" -> CodeType.REPOSITORY;
+            case "QueryDsl Repository" -> CodeType.QUERYDSL_REPOSITORY;
+            case "QueryDsl Repository Impl" -> CodeType.QUERYDSL_REPOSITORY_IMPL;
             case "MapStruct Mapper" -> CodeType.MAPSTRUCT_MAPPER;
             case "Mapper" -> CodeType.MAPPER;
             case "Query xml" -> CodeType.XML;
@@ -299,6 +303,7 @@ public class CodeGeneratorPanel extends JPanel {
 
         boolean isJpa = "jpa".equalsIgnoreCase(orm);
         boolean useMapStruct = config.isUseMapStruct();
+        boolean useQueryDsl = config.isUseQueryDsl();
 
         boolean isMybatis = "mybatis".equalsIgnoreCase(orm);
 
@@ -308,6 +313,10 @@ public class CodeGeneratorPanel extends JPanel {
         List<String> serviceTypes = new ArrayList<>(List.of("Controller", "Service Interface", "Service Impl"));
         if (isJpa) {
             serviceTypes.add("Repository");
+            if (useQueryDsl) {
+                serviceTypes.add("QueryDsl Repository");
+                serviceTypes.add("QueryDsl Repository Impl");
+            }
             if (useMapStruct) {
                 serviceTypes.add("MapStruct Mapper");  // ✅ MapStruct Mapper
             }
