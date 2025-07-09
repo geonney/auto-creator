@@ -16,8 +16,8 @@ public class EntityCodeGenerator {
 
     public static String generate(String className, String tableName, String schema, DatabaseType databaseType) {
         try {
+            String domain = tableName.substring(tableName.lastIndexOf('_') + 1);
             List<FieldMetadata> fields = DatabaseMetaReader.readTableFields(schema, tableName, databaseType);
-
             List<FieldMetadata> pkFields = fields.stream().filter(FieldMetadata::primaryKey).toList();
             List<FieldMetadata> nonPkFields = fields.stream().filter(f -> !f.primaryKey()).toList();
 
@@ -32,7 +32,7 @@ public class EntityCodeGenerator {
             sb.append("import jakarta.persistence.*;\n");
             sb.append("import lombok.Getter;\n");
             sb.append("import lombok.NoArgsConstructor;\n");
-            sb.append("import lombok.AllArgsConstructor;\n");
+//            sb.append("import lombok.AllArgsConstructor;\n");
             sb.append("import java.time.*;\n\n");
             boolean usesBigDecimal = fields.stream()
                     .anyMatch(f -> f.javaType().equals("BigDecimal"));
@@ -41,7 +41,7 @@ public class EntityCodeGenerator {
                 sb.append("import java.math.BigDecimal;\n");
             }
 
-            sb.append("@Getter\n@Entity\n@NoArgsConstructor\n@AllArgsConstructor\n");
+            sb.append("@Getter\n@Entity\n@NoArgsConstructor\n");
             sb.append("@Table(name = \"").append(tableName).append("\")\n");
             sb.append("public class ").append(className).append(" {\n\n");
 
@@ -68,6 +68,29 @@ public class EntityCodeGenerator {
                 sb.append(generateColumnAnnotation(field));
                 sb.append("    private ").append(field.javaType()).append(" ").append(field.fieldName()).append(";\n\n");
             }
+
+            //생성자
+            sb.append("    /** ").append("""
+                    생성자, modify 메서드에서 제외 해야하는 필드 목록
+                            1. BaseEntity field.
+                            2. @LastModifiedBy 를 추가할 field.
+                            3. AuditorAware 필드
+                    """).append("   */\n");
+            sb.append("    public ").append(className).append("(").append(domain).append("CreateRequestRecord")
+                    .append(" request) {\n");
+            for (FieldMetadata field : nonPkFields) {
+                sb.append("        this.").append(field.fieldName())
+                        .append(" = request.").append(field.fieldName()).append(";\n");
+            }
+            sb.append("    }\n\n");
+            //수정 메서드 (immutable 하기 때문에 mapper 사용 X)
+            sb.append("    public ").append("void modify(").append(domain).append("ModifyRequestRecord")
+                    .append(" request) {\n");
+            for (FieldMetadata field : nonPkFields) {
+                sb.append("        this.").append(field.fieldName())
+                        .append(" = request.").append(field.fieldName()).append(";\n");
+            }
+            sb.append("    }\n\n");
 
             sb.append("}\n");
 
