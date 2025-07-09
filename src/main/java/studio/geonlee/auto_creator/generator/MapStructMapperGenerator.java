@@ -36,9 +36,13 @@ public class MapStructMapperGenerator {
         sb.append("@Mapper(componentModel = \"spring\")\n");
         sb.append("public interface ").append(pascalDomain).append("Mapper {\n\n");
 
-        sb.append("    ").append(pascalDomain).append("SearchResponseRecord toSearchResponse(")
-                .append(CaseUtils.toUppercaseFirstLetter(tableName))
-                .append(" entity").append(");\n\n");
+        // toEntity -> entity immutable 정책으로 제거
+//        sb.append("    ").append(CaseUtils.toUppercaseFirstLetter(tableName)).append(" toEntity(")
+//                .append(pascalDomain).append("CreateRequestRecord record);\n\n");
+
+//        sb.append("    ").append(pascalDomain).append("SearchResponseRecord toSearchResponse(")
+//                .append(CaseUtils.toUppercaseFirstLetter(tableName))
+//                .append(" entity").append(");\n\n");
         sb.append("    List<").append(pascalDomain).append("SearchResponseRecord> toSearchResponseList(List<")
                 .append(CaseUtils.toUppercaseFirstLetter(tableName)).append("> entityList);\n\n");
 
@@ -46,14 +50,15 @@ public class MapStructMapperGenerator {
                 .append(CaseUtils.toUppercaseFirstLetter(tableName))
                 .append(" entity").append(");\n\n");
 
-        sb.append("    ").append(pascalDomain).append("UpdateResponseRecord toUpdateResponse(")
+        sb.append("    ").append(pascalDomain).append("ModifyResponseRecord toModifyResponse(")
                 .append(CaseUtils.toUppercaseFirstLetter(tableName))
                 .append(" entity").append(");\n\n");
 
-        sb.append("    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)\n");
-        sb.append("    ").append(CaseUtils.toUppercaseFirstLetter(tableName)).append(" updateFromRequest(")
-                .append(pascalDomain).append("ModifyRequestRecord request, @MappingTarget ")
-                .append(CaseUtils.toUppercaseFirstLetter(tableName)).append(" entity").append(");\n\n");
+        //entity immutable 정책으로 제거
+//        sb.append("    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)\n");
+//        sb.append("    ").append(CaseUtils.toUppercaseFirstLetter(tableName)).append(" updateFromRequest(")
+//                .append(pascalDomain).append("ModifyRequestRecord request, @MappingTarget ")
+//                .append(CaseUtils.toUppercaseFirstLetter(tableName)).append(" entity").append(");\n\n");
 
         sb.append("}\n");
 
