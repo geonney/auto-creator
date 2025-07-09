@@ -75,7 +75,8 @@ public class RecordGenerator {
             sb.append("public record ").append(recordName).append("(\n");
             for (int i = 0; i < selectedFields.size(); i++) {
                 FieldMetadata field = selectedFields.get(i);
-                String fieldType = convertFieldType(field.javaType(), isRequest);
+//                String fieldType = convertFieldType(field.javaType(), isRequest);
+                String fieldType = field.javaType();
 
                 // ✅ 주석 (swagger 사용하지 않을 경우 주석으로 필드 comment 추가)
                 if (!useSwagger && field.comment() != null) {
@@ -101,8 +102,14 @@ public class RecordGenerator {
                             .append("\")\n");
                 }
 
-                if(!isRequest) {
-                    if("LocalDate".equals(fieldType)) {
+                if (isRequest) {
+                    if ("LocalDate".equals(fieldType)) {
+                        sb.append("    @DateTimeFormat(pattern = \"yyyy-MM-dd\")\n");
+                    } else if ("LocalDateTime".equals(fieldType)) {
+                        sb.append("    @DateTimeFormat(pattern = \"yyyy-MM-dd HH:mm:ss\")\n");
+                    }
+                } else {
+                    if ("LocalDate".equals(fieldType)) {
                         sb.append("    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = \"yyyy-MM-dd\")\n");
                     } else if ("LocalDateTime".equals(fieldType)) {
                         sb.append("    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = \"yyyy-MM-dd HH:mm:ss\")\n");
@@ -156,7 +163,7 @@ public class RecordGenerator {
     private static boolean hasTime(List<FieldMetadata> selectedFields) {
 
         for (FieldMetadata field : selectedFields) {
-            if(field.javaType().contains("LocalDate")){
+            if (field.javaType().contains("LocalDate")) {
                 return true;
             }
         }
