@@ -1,6 +1,7 @@
 package studio.geonlee.auto_creator.common.util;
 
 import studio.geonlee.auto_creator.common.enumeration.DatabaseType;
+import studio.geonlee.auto_creator.common.enumeration.LogType;
 import studio.geonlee.auto_creator.common.record.FieldMetadata;
 import studio.geonlee.auto_creator.context.DatabaseContext;
 import studio.geonlee.auto_creator.ui.frame.MainFrame;
@@ -56,7 +57,7 @@ public class DatabaseMetaReader {
             }
 
         } catch (Exception ex) {
-            MainFrame.log("❌ 테이블 메타데이터 읽기 실패: " + ex.getMessage());
+            MainFrame.log("❌ 테이블 메타데이터 읽기 실패: " + ex.getMessage(), LogType.EXCEPTION);
         }
         return fields;
     }

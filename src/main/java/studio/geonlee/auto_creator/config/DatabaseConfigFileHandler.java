@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.util.StdDateFormat;
+import lombok.extern.slf4j.Slf4j;
+import studio.geonlee.auto_creator.common.enumeration.LogType;
 import studio.geonlee.auto_creator.config.dto.DatabaseConfig;
 import studio.geonlee.auto_creator.ui.frame.MainFrame;
 
@@ -15,6 +17,7 @@ import java.io.IOException;
  * @author GEON
  * @since 2025-04-25
  **/
+@Slf4j
 public class DatabaseConfigFileHandler {
 
     private static final ObjectMapper mapper = JsonMapper.builder()
@@ -25,13 +28,10 @@ public class DatabaseConfigFileHandler {
 
     public static DatabaseConfig load() {
         try {
-            File userFile = ConfigPathHelper.getUserDatabaseConfigFile();
-            if (userFile.exists()) {
-                return mapper.readValue(userFile, DatabaseConfig.class);
-            }
-            return mapper.readValue(ConfigPathHelper.getInternalDatabaseConfigFile(), DatabaseConfig.class);
+            File databaseConfigFile = ConfigPathHelper.getUserDatabaseConfigFile();
+            return mapper.readValue(databaseConfigFile, DatabaseConfig.class);
         } catch (IOException e) {
-            MainFrame.log("❌ 데이터베이스 설정 파일 로딩 실패: " + e.getMessage());
+            MainFrame.log("❌ 데이터베이스 설정 파일 로딩 실패: " + e.getMessage(), LogType.EXCEPTION);
             return null;
         }
     }
@@ -39,10 +39,9 @@ public class DatabaseConfigFileHandler {
     public static void save(DatabaseConfig config) {
         try {
             File userFile = ConfigPathHelper.getUserDatabaseConfigFile();
-            userFile.getParentFile().mkdirs();
             mapper.writeValue(userFile, config);
         } catch (IOException e) {
-            MainFrame.log("❌ 데이터베이스 설정 파일 저장 실패: " + e.getMessage());
+            MainFrame.log("❌ 데이터베이스 설정 파일 저장 실패: " + e.getMessage(), LogType.EXCEPTION);
         }
     }
 }

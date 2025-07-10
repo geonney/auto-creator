@@ -1,6 +1,8 @@
 package studio.geonlee.auto_creator.ui.frame;
 
+import lombok.extern.slf4j.Slf4j;
 import studio.geonlee.auto_creator.common.enumeration.DatabaseType;
+import studio.geonlee.auto_creator.common.enumeration.LogType;
 import studio.geonlee.auto_creator.config.DatabaseConfigFileHandler;
 import studio.geonlee.auto_creator.config.DefaultConfigFileHandler;
 import studio.geonlee.auto_creator.config.dto.DatabaseConfig;
@@ -32,6 +34,7 @@ import java.sql.ResultSet;
  * @author GEON
  * @since 2025-04-25
  **/
+@Slf4j
 public class MainFrame extends JFrame {
     private static MainFrame instance;
     private final JTextArea logArea = new JTextArea();
@@ -60,7 +63,7 @@ public class MainFrame extends JFrame {
                 setIconImage(icon);
             }
         } catch (IOException e) {
-            System.err.println("Icon setting Failure: " + e.getMessage());
+            log.error("Icon setting Failure: {}", e.getMessage());
         }
 
 
@@ -98,7 +101,8 @@ public class MainFrame extends JFrame {
                 selectedSchemaName = schemaNode.getUserObject().toString().replace("📁 ", "").trim();
 
                 codeGeneratorPanel.setClassNameFromTable(selectedTableName);
-                log(MessageUtil.get("main.chosen.table") + ": " + selectedSchemaName + "." + selectedTableName);
+                log(MessageUtil.get("main.chosen.table") + ": " + selectedSchemaName + "." + selectedTableName,
+                        LogType.INFO);
             } else {
                 selectedTableName = null;
                 selectedSchemaName = null;
@@ -109,7 +113,7 @@ public class MainFrame extends JFrame {
         add(splitPane, BorderLayout.CENTER);
         add(new JScrollPane(logArea), BorderLayout.SOUTH);
 
-        log(MessageUtil.get("main.initial.success"));
+        log(MessageUtil.get("main.initial.success"), LogType.INFO);
         setVisible(true);
 
         // TODO 이전에 저장한 DB 정보를 자동 매핑하기 위해 설정
@@ -201,9 +205,9 @@ public class MainFrame extends JFrame {
                 tableTree.expandRow(0);
             }
 
-            MainFrame.log(MessageUtil.get("table.load.success"));
+            MainFrame.log(MessageUtil.get("table.load.success"), LogType.INFO);
         } catch (Exception ex) {
-            MainFrame.log(MessageUtil.get("table.load.failure") + ": " + ex.getMessage());
+            MainFrame.log(MessageUtil.get("table.load.failure") + ": " + ex.getMessage(), LogType.EXCEPTION);
         }
     }
 
@@ -236,13 +240,14 @@ public class MainFrame extends JFrame {
                     }
 
                     refreshTableTree(); // ✅ 트리 다시 그리기
-                    MainFrame.log(MessageUtil.get("last.setting.load.success") + ": " + dbConfig.getDatabaseName());
+                    MainFrame.log(MessageUtil.get("last.setting.load.success") + ": " + dbConfig.getDatabaseName(),
+                            LogType.INFO);
                 } else {
-                    MainFrame.log(MessageUtil.get("no.database.setting"));
+                    MainFrame.log(MessageUtil.get("no.database.setting"), LogType.INFO);
                 }
             }
         } catch (Exception e) {
-            MainFrame.log(MessageUtil.get("last.setting.load.failure") + ": " + e.getMessage());
+            MainFrame.log(MessageUtil.get("last.setting.load.failure") + ": " + e.getMessage(), LogType.EXCEPTION);
         }
     }
 
@@ -264,7 +269,7 @@ public class MainFrame extends JFrame {
 
             DefaultConfigFileHandler.save(config);
         } catch (Exception ex) {
-            MainFrame.log("❌ 창 위치/크기 저장 실패: " + ex.getMessage());
+            MainFrame.log("❌ 창 위치/크기 저장 실패: " + ex.getMessage(), LogType.EXCEPTION);
         }
     }
 
@@ -276,10 +281,14 @@ public class MainFrame extends JFrame {
         }
     }
 
-    public static void log(String message) {
+    public static void log(String message, LogType logType) {
         String timestamp = java.time.LocalDateTime.now()
                 .format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-
+        if (logType == LogType.EXCEPTION) {
+            log.error(message);
+        } else {
+            log.info(message);
+        }
         instance.logArea.append("[" + timestamp + "] " + message + "\n");
         instance.logArea.setCaretPosition(instance.logArea.getDocument().getLength()); // 항상 스크롤 맨 밑으로
     }

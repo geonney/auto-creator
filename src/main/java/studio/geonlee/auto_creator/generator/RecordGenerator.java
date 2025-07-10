@@ -1,6 +1,7 @@
 package studio.geonlee.auto_creator.generator;
 
 import studio.geonlee.auto_creator.common.enumeration.DatabaseType;
+import studio.geonlee.auto_creator.common.enumeration.LogType;
 import studio.geonlee.auto_creator.common.record.FieldMetadata;
 import studio.geonlee.auto_creator.common.util.CaseUtils;
 import studio.geonlee.auto_creator.common.util.DatabaseMetaReader;
@@ -125,7 +126,7 @@ public class RecordGenerator {
             return sb.toString();
 
         } catch (Exception e) {
-            MainFrame.log("❌ Record 생성 실패: " + e.getMessage());
+            MainFrame.log("❌ Record 생성 실패: " + e.getMessage(), LogType.EXCEPTION);
             return "// ❌ Record 생성 실패: " + e.getMessage();
         }
     }

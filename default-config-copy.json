@@ -1,0 +1,17 @@
+{
+  "entityBasePackage" : "com.aljjabaegi.api.entity",
+  "domainBasePackage" : "com.aljjabaegi.api.domain",
+  "defaultSavePath" : "C:/Users/GEON/Desktop",
+  "theme" : "FlatDarculaLaf",
+  "autoLoadDatabaseOnStart" : true,
+  "expandTree" : true,
+  "useSwagger" : true,
+  "useMapStruct" : true,
+  "language" : "en",
+  "architecture" : "layered",
+  "orm" : "jpa",
+  "windowX" : 325,
+  "windowY" : 155,
+  "windowWidth" : 1070,
+  "windowHeight" : 800
+}

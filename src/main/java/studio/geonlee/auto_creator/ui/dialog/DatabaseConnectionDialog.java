@@ -1,8 +1,11 @@
 package studio.geonlee.auto_creator.ui.dialog;
 
 import studio.geonlee.auto_creator.common.enumeration.DatabaseType;
+import studio.geonlee.auto_creator.common.enumeration.LogType;
 import studio.geonlee.auto_creator.config.DatabaseConfigFileHandler;
+import studio.geonlee.auto_creator.config.DefaultConfigFileHandler;
 import studio.geonlee.auto_creator.config.dto.DatabaseConfig;
+import studio.geonlee.auto_creator.config.dto.DefaultConfig;
 import studio.geonlee.auto_creator.config.message.MessageUtil;
 import studio.geonlee.auto_creator.context.DatabaseContext;
 import studio.geonlee.auto_creator.ui.frame.MainFrame;
@@ -47,14 +50,16 @@ public class DatabaseConnectionDialog extends JDialog {
                 portField.setText(String.valueOf(selected.getDefaultPort()));
             }
         });
-
-        DatabaseConfig loaded = DatabaseConfigFileHandler.load();
-        if (loaded != null) {
-            databaseTypeCombo.setSelectedItem(DatabaseType.valueOf(loaded.getDatabaseType()));
-            hostField.setText(loaded.getHost());
-            portField.setText(String.valueOf(loaded.getPort()));
-            userField.setText(loaded.getUser());
-            passwordField.setText(loaded.getPassword());
+        DefaultConfig config = DefaultConfigFileHandler.load();
+        if (!config.isAutoLoadDatabaseOnStart()) {
+            DatabaseConfig loaded = DatabaseConfigFileHandler.load();
+            if (loaded != null) {
+                databaseTypeCombo.setSelectedItem(DatabaseType.valueOf(loaded.getDatabaseType()));
+                hostField.setText(loaded.getHost());
+                portField.setText(String.valueOf(loaded.getPort()));
+                userField.setText(loaded.getUser());
+                passwordField.setText(loaded.getPassword());
+            }
         }
     }
 
@@ -119,9 +124,10 @@ public class DatabaseConnectionDialog extends JDialog {
                 databaseCombo.addItem(rs.getString("datname"));
             }
 
-            MainFrame.log(MessageUtil.get("database.list.load.success"));
+            MainFrame.log(MessageUtil.get("database.list.load.success"), LogType.INFO);
         } catch (Exception ex) {
-            MainFrame.log(MessageUtil.get("database.list.load.failure") + ": " + ex.getMessage());
+            MainFrame.log(MessageUtil.get("database.list.load.failure") + ": " + ex.getMessage(),
+                    LogType.EXCEPTION);
             JOptionPane.showMessageDialog(this,
                     MessageUtil.get("database.list.load.failure") + ".\n" + ex.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
@@ -139,7 +145,8 @@ public class DatabaseConnectionDialog extends JDialog {
 
             connection = DriverManager.getConnection(url, userField.getText(), new String(passwordField.getPassword()));
             mainFrame.setDatabaseConnection(connection, selectedDatabase);
-            MainFrame.log(MessageUtil.get("database.connection.success") + ": " + selectedDatabase);
+            MainFrame.log(MessageUtil.get("database.connection.success") + ": " + selectedDatabase,
+                    LogType.INFO);
             dispose();
             DatabaseConfigFileHandler.save(new DatabaseConfig(
                     databaseType.name(),
@@ -150,7 +157,8 @@ public class DatabaseConnectionDialog extends JDialog {
                     selectedDatabase
             ));
         } catch (Exception ex) {
-            MainFrame.log(MessageUtil.get("database.connection.failure") + ": " + ex.getMessage());
+            MainFrame.log(MessageUtil.get("database.connection.failure") + ": " + ex.getMessage()
+                    , LogType.EXCEPTION);
             JOptionPane.showMessageDialog(this,
                     MessageUtil.get("database.connection.failure") + ".\n" + ex.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
@@ -166,7 +174,8 @@ public class DatabaseConnectionDialog extends JDialog {
             if (databaseType == DatabaseType.POSTGRESQL) {
                 url += "postgres";
             } else {
-                MainFrame.log("⚠️ " + databaseType + MessageUtil.get("not.supported.database"));
+                MainFrame.log("⚠️ " + databaseType + MessageUtil.get("not.supported.database"),
+                        LogType.INFO);
                 return;
             }
 
@@ -179,13 +188,14 @@ public class DatabaseConnectionDialog extends JDialog {
             }
 
             databaseCombo.setSelectedItem(databaseName); // ✅ 여기서 복원
-            MainFrame.log(MessageUtil.get("database.list.load.success"));
+            MainFrame.log(MessageUtil.get("database.list.load.success"), LogType.INFO);
 
             rs.close();
             tempConnection.close(); // 🔥 접속 끝나면 닫아야 한다
 
         } catch (Exception ex) {
-            MainFrame.log(MessageUtil.get("database.list.load.failure") + ": " + ex.getMessage());
+            MainFrame.log(MessageUtil.get("database.list.load.failure") + ": " + ex.getMessage(),
+                    LogType.EXCEPTION);
         }
     }
 

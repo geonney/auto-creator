@@ -1,11 +1,14 @@
 package studio.geonlee.auto_creator;
 
 import com.formdev.flatlaf.FlatDarculaLaf;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import studio.geonlee.auto_creator.ui.frame.MainFrame;
 
 import javax.swing.*;
 
-//@SpringBootApplication
+@Slf4j
 public class AutoCreatorApplication {
 
 	public static void main(String[] args) {
@@ -13,11 +16,11 @@ public class AutoCreatorApplication {
 		// 테마 적용
 		try {
 			UIManager.setLookAndFeel(new FlatDarculaLaf());
+			log.info("The application has been successfully run.");
 		} catch (Exception e) {
-			System.err.println("FlatLaf 테마 적용 실패");
+			log.error("FlatLaf 테마 적용 실패");
 		}
 
-//		SpringApplication.run(AutoCreatorApplication.class, args);
 		SwingUtilities.invokeLater(MainFrame::new); //MainFrame 실행
 	}
 

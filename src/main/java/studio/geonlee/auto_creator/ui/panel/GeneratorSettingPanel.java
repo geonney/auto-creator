@@ -1,6 +1,6 @@
 package studio.geonlee.auto_creator.ui.panel;
 
-import com.sun.tools.javac.Main;
+import studio.geonlee.auto_creator.common.enumeration.LogType;
 import studio.geonlee.auto_creator.common.util.CaseUtils;
 import studio.geonlee.auto_creator.config.DefaultConfigFileHandler;
 import studio.geonlee.auto_creator.config.dto.DefaultConfig;
@@ -125,14 +125,15 @@ public class GeneratorSettingPanel extends JPanel {
 
             DefaultConfigFileHandler.save(config);
 
-            MainFrame.log(MessageUtil.get("setting.save.success"));
+            MainFrame.log(MessageUtil.get("setting.save.success"), LogType.INFO);
             JOptionPane.showMessageDialog(this,
                     MessageUtil.get("setting.save.success") + ".",
                     "Information", JOptionPane.INFORMATION_MESSAGE);
 
             mainFrame.refreshCodeGeneratorPanel();
         } catch (Exception ex) {
-            MainFrame.log(MessageUtil.get("setting.save.failure") + ": " + ex.getMessage());
+            MainFrame.log(MessageUtil.get("setting.save.failure") + ": " + ex.getMessage(),
+                    LogType.EXCEPTION);
             JOptionPane.showMessageDialog(this,
                     MessageUtil.get("setting.save.failure") + "\n" + ex.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);

@@ -2,6 +2,7 @@ package studio.geonlee.auto_creator.ui.panel;
 
 import studio.geonlee.auto_creator.common.enumeration.CodeType;
 import studio.geonlee.auto_creator.common.enumeration.DatabaseType;
+import studio.geonlee.auto_creator.common.enumeration.LogType;
 import studio.geonlee.auto_creator.common.record.EntityMetadata;
 import studio.geonlee.auto_creator.common.record.FieldMetadata;
 import studio.geonlee.auto_creator.common.util.CaseUtils;
@@ -131,7 +132,8 @@ public class CodeGeneratorPanel extends JPanel {
         String code = EntityCodeGenerator.generate(className, tableName, schema, dbType);
         previewArea.setText(code);
         currentCodeType = CodeType.ENTITY;
-        MainFrame.log(MessageUtil.get("entity.create.success") + ": " + className + " (Table: " + schema + "." + tableName + ")");
+        MainFrame.log(MessageUtil.get("entity.create.success") + ": " +
+                className + " (Table: " + schema + "." + tableName + ")", LogType.INFO);
     }
 
     // ✅ Record 버튼 설정
@@ -187,7 +189,8 @@ public class CodeGeneratorPanel extends JPanel {
                     default -> null;
                 };
 
-                MainFrame.log(MessageUtil.get("record.create.success") + ": " + className + " (" + type + ")");
+                MainFrame.log(MessageUtil.get("record.create.success") + ": " + className + " (" + type + ")",
+                        LogType.INFO);
             });
             recordMenu.add(item);
         }
@@ -229,7 +232,8 @@ public class CodeGeneratorPanel extends JPanel {
                 previewArea.setText(code);
 
                 // 필요하면 CodeType에 QUERY_SELECT, QUERY_INSERT 등 추가
-                MainFrame.log(MessageUtil.get("query.create.success") + ": " + className + " (" + type + ")");
+                MainFrame.log(MessageUtil.get("query.create.success") + ": " + className + " (" + type + ")",
+                        LogType.INFO);
             });
             queryMenu.add(item);
         }
@@ -293,7 +297,8 @@ public class CodeGeneratorPanel extends JPanel {
             default -> null;
         };
 
-        MainFrame.log(MessageUtil.get("service.create.success") + ": " + className + " (" + type + ")");
+        MainFrame.log(MessageUtil.get("service.create.success") + ": " + className + " (" + type + ")",
+                LogType.INFO);
     }
 
     // ✅ ORM 변경 시 버튼/메뉴 업데이트
@@ -370,9 +375,11 @@ public class CodeGeneratorPanel extends JPanel {
         if (result == JFileChooser.APPROVE_OPTION) {
             try (FileWriter writer = new FileWriter(chooser.getSelectedFile())) {
                 writer.write(code);
-                MainFrame.log(MessageUtil.get("file.save.success") + ": " + chooser.getSelectedFile().getAbsolutePath());
+                MainFrame.log(MessageUtil.get("file.save.success") + ": " +
+                        chooser.getSelectedFile().getAbsolutePath(), LogType.INFO);
             } catch (IOException ex) {
-                MainFrame.log(MessageUtil.get("file.save.failure") + ": " + ex.getMessage());
+                MainFrame.log(MessageUtil.get("file.save.failure") + ": " + ex.getMessage(),
+                        LogType.EXCEPTION);
                 JOptionPane.showMessageDialog(this,
                         MessageUtil.get("file.save.failure") + ".\n" + ex.getMessage(),
                         "Error", JOptionPane.ERROR_MESSAGE);
@@ -394,7 +401,7 @@ public class CodeGeneratorPanel extends JPanel {
                 .getSystemClipboard()
                 .setContents(new java.awt.datatransfer.StringSelection(code), null);
 
-        MainFrame.log(MessageUtil.get("code.copy.success"));
+        MainFrame.log(MessageUtil.get("code.copy.success"), LogType.INFO);
     }
 
     public void setClassNameFromTable(String tableName) {

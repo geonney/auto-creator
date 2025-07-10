@@ -35,6 +35,10 @@ dependencies {
 
 	// https://mvnrepository.com/artifact/com.formdev/flatlaf
 	implementation 'com.formdev:flatlaf:3.6'
+
+	implementation 'ch.qos.logback:logback-classic:1.5.13'
+	implementation 'org.slf4j:slf4j-api:2.0.12'
+	implementation 'org.codehaus.janino:janino:3.1.12'
 }
 
 tasks.named('test') {

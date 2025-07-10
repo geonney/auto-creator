@@ -1,7 +1,8 @@
 spring:
   application:
     name: auto-creator
-
+  profiles:
+    active: prod
   datasource:
     url: jdbc:postgresql://localhost:5432/test
     driver-class-name: org.postgresql.Driver
@@ -11,3 +12,5 @@ spring:
   messages:
     basename: message/messages
     encoding: UTF-8
+logging:
+  config: classpath:logback.xml
