@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="true" scan="true">
+
+    <redirectStderr>true</redirectStderr>
+    <redirectStderrFile>error.log</redirectStderrFile>
+    <redirectStdout>true</redirectStdout>
+    <redirectStdoutFile>stdout.log</redirectStdoutFile>
+
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+
+    <property name="ACTIVE" value="prod"/>
+    <property name="PROJECT_NAME" value="auto-code"/>
+
+    <property name="LOG_DIR" value="logs/${PROJECT_NAME}-${ACTIVE}"/>
+    <property name="REQUEST_RESPONSE_FILE_NAME" value="${PROJECT_NAME}_request_response"/>
+    <property name="INFORMATION_FILE_NAME" value="${PROJECT_NAME}_information"/>
+    <property name="EXCEPTION_FILE_NAME" value="${PROJECT_NAME}_exception"/>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="INFORMATION_FILE_NAME" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/${INFORMATION_FILE_NAME}.log</file>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/02.info/%d{yyyy-MM-dd, aux}/%d{HH}.log</fileNamePattern>
+            <maxHistory>100</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{HH:mm:ss} [%-5p] [%F]%M\(%L\) : %m%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="EXCEPTION_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/${EXCEPTION_FILE_NAME}.log</file>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/01.exception/%d{yyyy-MM-dd, aux}/%d{HH_mm}.log</fileNamePattern>
+        </rollingPolicy>
+        <encoder>
+            <pattern>[%d{yyyy-MM-dd}] [%d{HH:mm:ss.SSS}] [%-5p] [%F]%M\(%L\) : %m%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="REQUEST_RESPONSE_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/${REQUEST_RESPONSE_FILE_NAME}.log</file>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/03.request_response/%d{yyyy-MM-dd, aux}/%d{HH}.log</fileNamePattern>
+        </rollingPolicy>
+        <encoder>
+            <pattern>[%d{yyyy-MM-dd}] [%d{HH:mm:ss.SSS}] : %m%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="INFORMATION_FILE_NAME"/>
+        <appender-ref ref="EXCEPTION_FILE"/>
+        <appender-ref ref="CONSOLE" />
+    </root>
+</configuration>
