@@ -73,7 +73,7 @@ public class ServiceImplGenerator {
 
         sb.append("    @Override\n");
         sb.append("    public ").append(pascalDomain).append("SearchResponseRecord searchDetail(")
-                .append(pascalDomain).append("String id) {\n");
+                .append("String id) {\n");
         sb.append("        // TODO: Detail search logic\n");
         sb.append("        return null;\n");
         sb.append("    }\n\n");
