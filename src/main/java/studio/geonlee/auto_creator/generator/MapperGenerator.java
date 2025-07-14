@@ -25,7 +25,7 @@ public class MapperGenerator {
         sb.append("import org.apache.ibatis.annotations.Mapper;\n");
         sb.append("import java.util.List;\n");
         sb.append("import ").append(fullPackage).append(".record.").append(entityName).append("CreateRequestRecord;\n");
-        sb.append("import ").append(fullPackage).append(".record.").append(entityName).append("UpdateRequestRecord;\n");
+        sb.append("import ").append(fullPackage).append(".record.").append(entityName).append("ModifyRequestRecord;\n");
         sb.append("import ").append(fullPackage).append(".record.").append(entityName).append("DeleteRequestRecord;\n");
         sb.append("import ").append(fullPackage).append(".record.").append(entityName).append("SearchRequestRecord;\n");
         sb.append("import ").append(fullPackage).append(".record.").append(entityName).append("SearchResponseRecord;\n\n");
@@ -37,7 +37,7 @@ public class MapperGenerator {
         sb.append("    void insert(").append(entityName).append("CreateRequestRecord request);\n\n");
 
         // Update
-        sb.append("    void update(").append(entityName).append("UpdateRequestRecord request);\n\n");
+        sb.append("    void update(").append(entityName).append("ModifyRequestRecord request);\n\n");
 
         // Delete
         sb.append("    void delete(").append(entityName).append("DeleteRequestRecord request);\n\n");

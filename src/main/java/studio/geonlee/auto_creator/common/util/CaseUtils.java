@@ -33,4 +33,24 @@ public class CaseUtils {
         }
         return sb.toString();
     }
+
+    public static String extractDomain(String tableName) {
+        // 1. 접두사 제거 (예: 'M_' or 'L_')
+        String withoutPrefix = tableName.substring(tableName.indexOf('_') + 1);
+
+        // 2. '_' 로 나눈 후 카멜케이스 변환
+        String[] parts = withoutPrefix.split("_");
+        if (parts.length == 0) return "";
+        StringBuilder domain = new StringBuilder(parts[0]); // 첫 단어는 소문자 그대로
+
+        for (int i = 1; i < parts.length; i++) {
+            String part = parts[i];
+            if (!part.isEmpty()) {
+                domain.append(part.substring(0, 1).toUpperCase())
+                        .append(part.substring(1).toLowerCase());
+            }
+        }
+
+        return domain.toString();
+    }
 }

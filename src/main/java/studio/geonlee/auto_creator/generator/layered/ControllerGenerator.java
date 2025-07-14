@@ -14,11 +14,9 @@ public class ControllerGenerator {
         String domainBasePackage = config.getDomainBasePackage();
         String basePackage = domainBasePackage.replace(".domain", "");
         String tableName = meta.tableName().toLowerCase();
-        String domain = tableName.substring(tableName.lastIndexOf('_') + 1);
-        String pascalDomain = CaseUtils.toPascalCase(domain);
+        String domain = CaseUtils.extractDomain(tableName);
+        String pascalDomain = CaseUtils.toUppercaseFirstLetter(domain);
         String fullPackage = domainBasePackage + "." + domain;
-
-        String entityName = meta.baseClassName();
 
         StringBuilder sb = new StringBuilder();
 

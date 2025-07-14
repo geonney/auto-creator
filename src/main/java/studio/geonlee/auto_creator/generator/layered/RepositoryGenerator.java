@@ -19,8 +19,8 @@ public class RepositoryGenerator {
         String basePackage = config.getDomainBasePackage();
         String entityBasePackage = config.getEntityBasePackage();
         String tableName = meta.tableName().toLowerCase();
-        String domain = tableName.substring(tableName.lastIndexOf('_') + 1);
-        String pascalDomain = CaseUtils.toPascalCase(domain);
+        String domain = CaseUtils.extractDomain(tableName);
+        String pascalDomain = CaseUtils.toUppercaseFirstLetter(domain);
         String fullPackage = basePackage + "." + domain;
 
         String entityName = meta.baseClassName();
@@ -49,7 +49,7 @@ public class RepositoryGenerator {
         }
         sb.append("\n");
 
-        sb.append("public interface ").append((pascalDomain))
+        sb.append("public interface ").append(pascalDomain)
                 .append("Repository extends JpaRepository<")
                 .append(CaseUtils.toUppercaseFirstLetter(tableName)).append(", ")
                 .append(CaseUtils.toUppercaseFirstLetter(pkType)).append("> {\n");

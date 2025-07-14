@@ -16,8 +16,8 @@ public class QueryDslRepositoryImplGenerator {
         String basePackage = config.getDomainBasePackage();
         String entityBasePackage = config.getEntityBasePackage();
         String tableName = meta.tableName().toLowerCase();
-        String domain = tableName.substring(tableName.lastIndexOf('_') + 1);
-        String pascalDomain = CaseUtils.toPascalCase(domain);
+        String domain = CaseUtils.extractDomain(tableName);
+        String pascalDomain = CaseUtils.toUppercaseFirstLetter(domain);
         String fullPackage = basePackage + "." + domain;
 
         StringBuilder sb = new StringBuilder();

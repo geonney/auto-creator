@@ -31,8 +31,9 @@ public class RecordGenerator {
             // ✅ mode 분리
             boolean isRequest = mode.endsWith("-request");
             String action = mode.split("-")[0]; // "create", "update", "delete", "search"
-            String domainName = baseClassName.substring(baseClassName.lastIndexOf('_') + 1);
-            String recordName = CaseUtils.toPascalCase(domainName) + CaseUtils.toPascalCase(action) +
+            String domain = CaseUtils.extractDomain(tableName);
+            String pascalDomain = CaseUtils.toUppercaseFirstLetter(domain);
+            String recordName = pascalDomain + CaseUtils.toPascalCase(action) +
                     (isRequest ? "RequestRecord" : "ResponseRecord");
 
             // ✅ 필드 필터링
@@ -50,7 +51,7 @@ public class RecordGenerator {
             DefaultConfig config = DefaultConfigFileHandler.load();
             boolean useSwagger = config.isUseSwagger();
             String basePackage = config.getDomainBasePackage();
-            String recordPackage = basePackage + "." + domainName + ".record";
+            String recordPackage = basePackage + "." + domain + ".record";
 
             StringBuilder sb = new StringBuilder();
             sb.append("package ").append(recordPackage).append(";").append("\n\n");
@@ -68,7 +69,7 @@ public class RecordGenerator {
             if (useSwagger) {
                 sb.append("import io.swagger.v3.oas.annotations.media.Schema;\n\n");
                 sb.append("@Schema(description = \"")
-                        .append(CaseUtils.toPascalCase(domainName)).append(" ").append(CaseUtils.toPascalCase(action))
+                        .append(pascalDomain).append(" ").append(CaseUtils.toPascalCase(action))
                         .append(isRequest ? " Request" : " Response")
                         .append(" Record\")\n");
             }
