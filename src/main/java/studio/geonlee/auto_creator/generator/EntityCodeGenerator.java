@@ -2,6 +2,7 @@ package studio.geonlee.auto_creator.generator;
 
 import studio.geonlee.auto_creator.common.enumeration.DatabaseType;
 import studio.geonlee.auto_creator.common.record.FieldMetadata;
+import studio.geonlee.auto_creator.common.util.CaseUtils;
 import studio.geonlee.auto_creator.common.util.DatabaseMetaReader;
 import studio.geonlee.auto_creator.config.DefaultConfigFileHandler;
 import studio.geonlee.auto_creator.config.dto.DefaultConfig;
@@ -76,19 +77,19 @@ public class EntityCodeGenerator {
                             2. @LastModifiedBy 를 추가할 field.
                             3. AuditorAware 필드
                     """).append("   */\n");
-            sb.append("    public ").append(className).append("(").append(domain).append("CreateRequestRecord")
-                    .append(" request) {\n");
+            sb.append("    public ").append(className).append("(").append(CaseUtils.toUppercaseFirstLetter(domain))
+                    .append("CreateRequestRecord").append(" request) {\n");
             for (FieldMetadata field : nonPkFields) {
                 sb.append("        this.").append(field.fieldName())
-                        .append(" = request.").append(field.fieldName()).append(";\n");
+                        .append(" = request.").append(field.fieldName()).append("();\n");
             }
             sb.append("    }\n\n");
             //수정 메서드 (immutable 하기 때문에 mapper 사용 X)
-            sb.append("    public ").append("void modify(").append(domain).append("ModifyRequestRecord")
-                    .append(" request) {\n");
+            sb.append("    public ").append("void modify(").append(CaseUtils.toUppercaseFirstLetter(domain))
+                    .append("ModifyRequestRecord").append(" request) {\n");
             for (FieldMetadata field : nonPkFields) {
                 sb.append("        this.").append(field.fieldName())
-                        .append(" = request.").append(field.fieldName()).append(";\n");
+                        .append(" = request.").append(field.fieldName()).append("();\n");
             }
             sb.append("    }\n\n");
 
