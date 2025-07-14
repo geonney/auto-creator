@@ -41,7 +41,7 @@ public class ServiceImplGenerator {
         sb.append("@RequiredArgsConstructor\n");
         sb.append("public class ").append(pascalDomain).append("ServiceImpl implements ").append(pascalDomain).append("Service {\n\n");
 
-        sb.append("    private final ").append(pascalDomain).append("Repository ").append(pascalDomain).append("Repository;\n\n");
+        sb.append("    private final ").append(pascalDomain).append("Repository ").append(domain).append("Repository;\n\n");
 
         sb.append("    @Override\n");
         sb.append("    public ").append(pascalDomain).append("CreateResponseRecord create(")

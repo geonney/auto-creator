@@ -55,7 +55,7 @@ public class ControllerGenerator {
             sb.append("@Tag(name = \"").append(pascalDomain).append("\")\n");
         }
         sb.append("@RestController\n");
-        sb.append("@RequestMapping(\"/api/").append(domain).append("\")\n");
+        sb.append("@RequestMapping(\"/api").append("\")\n");
         sb.append("@RequiredArgsConstructor\n");
         sb.append("public class ").append(pascalDomain).append("Controller {\n\n");
 
@@ -66,7 +66,7 @@ public class ControllerGenerator {
             sb.append("    @Operation(summary = \"").append(pascalDomain).append(" 생성\", description = \"")
                     .append(pascalDomain).append(" 정보를 생성합니다.\")\n");
         }
-        sb.append("    @PostMapping(\"/create\")\n");
+        sb.append("    @PostMapping(\"/").append(domain).append("/create\")\n");
         sb.append("    public ResponseEntity<").append("ItemResponse<").append(pascalDomain)
                 .append("CreateResponseRecord>> create(\n            @RequestBody @Valid ")
                 .append(pascalDomain).append("CreateRequestRecord request) {\n");
@@ -85,7 +85,7 @@ public class ControllerGenerator {
             sb.append("    @Operation(summary = \"").append(pascalDomain).append(" 수정\", description = \"")
                     .append(pascalDomain).append(" 정보를 수정합니다.\")\n");
         }
-        sb.append("    @PostMapping(\"/modify\")\n");
+        sb.append("    @PostMapping(\"/").append(domain).append("/modify\")\n");
         sb.append("    public ResponseEntity<").append("ItemResponse<").append(pascalDomain)
                 .append("ModifyResponseRecord>> modify(\n            @RequestBody @Valid ")
                 .append(pascalDomain).append("ModifyRequestRecord request) {\n");
@@ -104,7 +104,7 @@ public class ControllerGenerator {
             sb.append("    @Operation(summary = \"").append(pascalDomain).append(" 삭제\", description = \"")
                     .append(pascalDomain).append(" 정보를 삭제합니다.\")\n");
         }
-        sb.append("    @PostMapping(\"/delete\")\n");
+        sb.append("    @PostMapping(\"/").append(domain).append("/delete\")\n");
         sb.append("    public ResponseEntity<").append("ItemResponse<").append(pascalDomain)
                 .append("DeleteResponseRecord>> delete(\n            @RequestBody @Valid ")
                 .append(pascalDomain).append("DeleteRequestRecord request) {\n");
@@ -128,7 +128,7 @@ public class ControllerGenerator {
                 .append("SearchResponseRecord>> searchList(\n            @ModelAttribute @Valid ")
                 .append(pascalDomain).append("SearchRequestRecord request) {\n");
         sb.append("        List<").append(pascalDomain).append("SearchResponseRecord> list = ")
-                .append(pascalDomain).append("Service.searchList(request);\n");
+                .append(domain).append("Service.searchList(request);\n");
         sb.append("        return ResponseEntity\n");
         sb.append("                 .ok()\n");
         sb.append("                 .body(ItemsResponse.<").append(pascalDomain).append("SearchResponseRecord>builder()\n");
@@ -149,7 +149,7 @@ public class ControllerGenerator {
                 .append("SearchResponseRecord>> searchDetail(\n            @PathVariable ")
                 .append("String id) {\n");
         sb.append("        ").append(pascalDomain).append("SearchResponseRecord data = ")
-                .append(pascalDomain).append("Service.searchDetail(id);\n");
+                .append(domain).append("Service.searchDetail(id);\n");
         sb.append("        return ResponseEntity\n");
         sb.append("                 .ok()\n");
         sb.append("                 .body(ItemResponse.<").append(pascalDomain).append("SearchResponseRecord>builder()\n");
