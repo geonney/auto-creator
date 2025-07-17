@@ -18,10 +18,7 @@ import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import java.awt.*;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
@@ -108,9 +105,50 @@ public class MainFrame extends JFrame {
                 codeGeneratorPanel.setClassNameFromTable(selectedTableName);
                 log(MessageUtil.get("main.chosen.table") + ": " + selectedSchemaName + "." + selectedTableName,
                         LogType.INFO);
+                codeGeneratorPanel.clear();
             } else {
                 selectedTableName = null;
                 selectedSchemaName = null;
+            }
+        });
+        // F5 키 바인딩 설정 (JTree에 포커스가 있을 때만 동작)
+        tableTree.getInputMap(JComponent.WHEN_FOCUSED)
+                .put(KeyStroke.getKeyStroke("F5"), "refreshTree");
+
+        tableTree.getActionMap().put("refreshTree", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // F5 눌렀을 때 실행할 코드
+                refreshTableTree();
+                // 예: 트리 모델 재로드, 데이터 동기화 등
+            }
+        });
+        // 팝업 메뉴 생성
+        JPopupMenu popupMenu = new JPopupMenu();
+        JMenuItem actionItem = new JMenuItem(MessageUtil.get("button.refresh"));
+        popupMenu.add(actionItem);
+        actionItem.addActionListener(e -> {
+            refreshTableTree();
+        });
+
+        // 트리에 마우스 리스너 추가
+        tableTree.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                showPopup(e);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                showPopup(e);
+            }
+
+            private void showPopup(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+//                    int row = tableTree.getClosestRowForLocation(e.getX(), e.getY());
+//                    tableTree.setSelectionRow(row); // 클릭한 노드를 선택 상태로 만듦
+                    popupMenu.show(tableTree, e.getX(), e.getY()); // 팝업 표시
+                }
             }
         });
 
