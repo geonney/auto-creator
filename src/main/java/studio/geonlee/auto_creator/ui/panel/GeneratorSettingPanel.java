@@ -2,9 +2,10 @@ package studio.geonlee.auto_creator.ui.panel;
 
 import studio.geonlee.auto_creator.common.enumeration.LogType;
 import studio.geonlee.auto_creator.common.util.CaseUtils;
-import studio.geonlee.auto_creator.config.DefaultConfigFileHandler;
 import studio.geonlee.auto_creator.config.dto.DefaultConfig;
 import studio.geonlee.auto_creator.config.message.MessageUtil;
+import studio.geonlee.auto_creator.config.setting.DefaultConfigFileHandler;
+import studio.geonlee.auto_creator.config.setting.GlobalConfig;
 import studio.geonlee.auto_creator.ui.frame.MainFrame;
 
 import javax.swing.*;
@@ -100,7 +101,7 @@ public class GeneratorSettingPanel extends JPanel {
     }
 
     private void loadSettings() {
-        DefaultConfig config = DefaultConfigFileHandler.load();
+        DefaultConfig config = GlobalConfig.defaultConfig;
         if (config != null) {
             architectureComboBox.setSelectedItem(config.getArchitecture().toUpperCase());
             ormComboBox.setSelectedItem(("jpa".equals(config.getOrm())
@@ -114,7 +115,7 @@ public class GeneratorSettingPanel extends JPanel {
 
     private void saveSettings() {
         try {
-            DefaultConfig config = DefaultConfigFileHandler.load();
+            DefaultConfig config = GlobalConfig.defaultConfig;
             if (config == null) config = new DefaultConfig();
 
             config.setArchitecture(String.valueOf(architectureComboBox.getSelectedItem()).toLowerCase());
@@ -122,8 +123,8 @@ public class GeneratorSettingPanel extends JPanel {
             config.setUseSwagger(useSwaggerCheck.isSelected());
             config.setUseMapStruct(useMapStructCheck.isSelected());
             config.setUseQueryDsl(useQueryDslCheck.isSelected());
-
-            DefaultConfigFileHandler.save(config);
+            DefaultConfigFileHandler defaultConfigFileHandler = new DefaultConfigFileHandler();
+            defaultConfigFileHandler.save(config);
 
             MainFrame.log(MessageUtil.get("setting.save.success"), LogType.INFO);
             JOptionPane.showMessageDialog(this,

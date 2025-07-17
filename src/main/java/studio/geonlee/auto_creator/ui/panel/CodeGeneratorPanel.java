@@ -7,9 +7,9 @@ import studio.geonlee.auto_creator.common.record.EntityMetadata;
 import studio.geonlee.auto_creator.common.record.FieldMetadata;
 import studio.geonlee.auto_creator.common.util.CaseUtils;
 import studio.geonlee.auto_creator.common.util.DatabaseMetaReader;
-import studio.geonlee.auto_creator.config.DefaultConfigFileHandler;
 import studio.geonlee.auto_creator.config.dto.DefaultConfig;
 import studio.geonlee.auto_creator.config.message.MessageUtil;
+import studio.geonlee.auto_creator.config.setting.GlobalConfig;
 import studio.geonlee.auto_creator.context.DatabaseContext;
 import studio.geonlee.auto_creator.generator.*;
 import studio.geonlee.auto_creator.generator.layered.ControllerGenerator;
@@ -303,7 +303,7 @@ public class CodeGeneratorPanel extends JPanel {
 
     // ✅ ORM 변경 시 버튼/메뉴 업데이트
     public void refreshOrmSettings() {
-        DefaultConfig config = DefaultConfigFileHandler.load();
+        DefaultConfig config = GlobalConfig.defaultConfig;
         String orm = config.getOrm();
 
         boolean isJpa = "jpa".equalsIgnoreCase(orm);

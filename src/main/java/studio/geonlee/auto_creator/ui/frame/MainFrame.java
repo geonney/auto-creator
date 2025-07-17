@@ -3,11 +3,10 @@ package studio.geonlee.auto_creator.ui.frame;
 import lombok.extern.slf4j.Slf4j;
 import studio.geonlee.auto_creator.common.enumeration.DatabaseType;
 import studio.geonlee.auto_creator.common.enumeration.LogType;
-import studio.geonlee.auto_creator.config.DatabaseConfigFileHandler;
-import studio.geonlee.auto_creator.config.DefaultConfigFileHandler;
-import studio.geonlee.auto_creator.config.dto.DatabaseConfig;
-import studio.geonlee.auto_creator.config.dto.DefaultConfig;
 import studio.geonlee.auto_creator.config.message.MessageUtil;
+import studio.geonlee.auto_creator.config.setting.DatabaseConfigFileHandler;
+import studio.geonlee.auto_creator.config.setting.DefaultConfigFileHandler;
+import studio.geonlee.auto_creator.config.setting.GlobalConfig;
 import studio.geonlee.auto_creator.context.DatabaseContext;
 import studio.geonlee.auto_creator.ui.dialog.AboutDialog;
 import studio.geonlee.auto_creator.ui.dialog.DatabaseConnectionDialog;
@@ -40,7 +39,7 @@ public class MainFrame extends JFrame {
     private final JTextArea logArea = new JTextArea();
     private final DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode("No database");
     private final JTree tableTree = new JTree(rootNode);
-    private final CodeGeneratorPanel codeGeneratorPanel = new CodeGeneratorPanel(this);
+    private final CodeGeneratorPanel codeGeneratorPanel;
     private final DatabaseConnectionDialog databaseConnectionDialog;
     private String selectedTableName;
     private String selectedSchemaName;
@@ -66,11 +65,16 @@ public class MainFrame extends JFrame {
             log.error("Icon setting Failure: {}", e.getMessage());
         }
 
-
-        DefaultConfig config = DefaultConfigFileHandler.load();
+        //설정 파일 로드
+        DatabaseConfigFileHandler databaseConfigFileHandler = new DatabaseConfigFileHandler();
+        DefaultConfigFileHandler defaultConfigFileHandler = new DefaultConfigFileHandler();
+        GlobalConfig.defaultConfig = defaultConfigFileHandler.load();
+        GlobalConfig.databaseConfig = databaseConfigFileHandler.load();
         setMinimumSize(new Dimension(1070, 800));
-        if (config != null && config.getWindowWidth() > 0 && config.getWindowHeight() > 0) {
-            setBounds(config.getWindowX(), config.getWindowY(), config.getWindowWidth(), config.getWindowHeight());
+        if (GlobalConfig.defaultConfig != null && GlobalConfig.defaultConfig.getWindowWidth() > 0
+                && GlobalConfig.defaultConfig.getWindowHeight() > 0) {
+            setBounds(GlobalConfig.defaultConfig.getWindowX(), GlobalConfig.defaultConfig.getWindowY(),
+                    GlobalConfig.defaultConfig.getWindowWidth(), GlobalConfig.defaultConfig.getWindowHeight());
         } else {
             setSize(1070, 800); // 기본 사이즈
             setLocationRelativeTo(null); // 화면 중앙
@@ -80,10 +84,11 @@ public class MainFrame extends JFrame {
         setupMenu();
         setupLogArea();
 
+        codeGeneratorPanel = new CodeGeneratorPanel(this);
         JSplitPane splitPane = new JSplitPane(
                 JSplitPane.HORIZONTAL_SPLIT,
                 new JScrollPane(tableTree),
-                codeGeneratorPanel // ← 여기
+                codeGeneratorPanel
         );
         //테이블 트리 이벤트
         tableTree.addTreeSelectionListener(e -> {
@@ -198,8 +203,7 @@ public class MainFrame extends JFrame {
 
             ((DefaultTreeModel) tableTree.getModel()).reload();
 
-            DefaultConfig config = DefaultConfigFileHandler.load();
-            if (config != null && config.isExpandTree()) {
+            if (GlobalConfig.defaultConfig != null && GlobalConfig.defaultConfig.isExpandTree()) {
                 expandAllNodes(tableTree); // ✅ 트리 확장 여기 추가
             } else {
                 tableTree.expandRow(0);
@@ -221,27 +225,27 @@ public class MainFrame extends JFrame {
 
     private void tryAutoConnectDatabase() {
         try {
-            DefaultConfig config = DefaultConfigFileHandler.load();
-            if (config.isAutoLoadDatabaseOnStart()) {
-                DatabaseConfig dbConfig = DatabaseConfigFileHandler.load();
-                if (dbConfig != null) {
-                    DatabaseType dbType = DatabaseType.valueOf(dbConfig.getDatabaseType());
-                    String url = dbType.formatUrl(dbConfig.getHost(), dbConfig.getPort()) + dbConfig.getDatabaseName();
+            if (GlobalConfig.defaultConfig.isAutoLoadDatabaseOnStart()) {
+                if (GlobalConfig.databaseConfig != null) {
+                    DatabaseType dbType = DatabaseType.valueOf(GlobalConfig.databaseConfig.getDatabaseType());
+                    String url = dbType.formatUrl(GlobalConfig.databaseConfig.getHost(),
+                            GlobalConfig.databaseConfig.getPort()) + GlobalConfig.databaseConfig.getDatabaseName();
 
-                    Connection conn = DriverManager.getConnection(url, dbConfig.getUser(), dbConfig.getPassword());
+                    Connection conn = DriverManager.getConnection(url, GlobalConfig.databaseConfig.getUser(),
+                            GlobalConfig.databaseConfig.getPassword());
                     DatabaseContext.setConnection(conn);
                     DatabaseContext.setDatabaseType(dbType);
-                    DatabaseContext.setDatabaseName(dbConfig.getDatabaseName());
+                    DatabaseContext.setDatabaseName(GlobalConfig.databaseConfig.getDatabaseName());
 
                     // ✅ 연결 성공했으면
                     if (databaseConnectionDialog != null) {
-                        databaseConnectionDialog.setDatabaseConfig(dbConfig);
-                        databaseConnectionDialog.loadDatabaseListAndSelect(dbConfig.getDatabaseName());
+                        databaseConnectionDialog.setDatabaseConfig(GlobalConfig.databaseConfig);
+                        databaseConnectionDialog.loadDatabaseListAndSelect(GlobalConfig.databaseConfig.getDatabaseName());
                     }
 
                     refreshTableTree(); // ✅ 트리 다시 그리기
-                    MainFrame.log(MessageUtil.get("last.setting.load.success") + ": " + dbConfig.getDatabaseName(),
-                            LogType.INFO);
+                    MainFrame.log(MessageUtil.get("last.setting.load.success") + ": " +
+                            GlobalConfig.databaseConfig.getDatabaseName(), LogType.INFO);
                 } else {
                     MainFrame.log(MessageUtil.get("no.database.setting"), LogType.INFO);
                 }
@@ -259,15 +263,13 @@ public class MainFrame extends JFrame {
 
     private void saveWindowSettings() {
         try {
-            DefaultConfig config = DefaultConfigFileHandler.load();
-            if (config == null) config = new DefaultConfig();
+            GlobalConfig.defaultConfig.setWindowX(getX());
+            GlobalConfig.defaultConfig.setWindowY(getY());
+            GlobalConfig.defaultConfig.setWindowWidth(getWidth());
+            GlobalConfig.defaultConfig.setWindowHeight(getHeight());
 
-            config.setWindowX(getX());
-            config.setWindowY(getY());
-            config.setWindowWidth(getWidth());
-            config.setWindowHeight(getHeight());
-
-            DefaultConfigFileHandler.save(config);
+            DefaultConfigFileHandler defaultConfigFileHandler = new DefaultConfigFileHandler();
+            defaultConfigFileHandler.save(GlobalConfig.defaultConfig);
         } catch (Exception ex) {
             MainFrame.log("❌ 창 위치/크기 저장 실패: " + ex.getMessage(), LogType.EXCEPTION);
         }

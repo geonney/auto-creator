@@ -5,8 +5,9 @@ import studio.geonlee.auto_creator.common.enumeration.LogType;
 import studio.geonlee.auto_creator.common.record.FieldMetadata;
 import studio.geonlee.auto_creator.common.util.CaseUtils;
 import studio.geonlee.auto_creator.common.util.DatabaseMetaReader;
-import studio.geonlee.auto_creator.config.DefaultConfigFileHandler;
+import studio.geonlee.auto_creator.config.setting.DefaultConfigFileHandler;
 import studio.geonlee.auto_creator.config.dto.DefaultConfig;
+import studio.geonlee.auto_creator.config.setting.GlobalConfig;
 import studio.geonlee.auto_creator.ui.frame.MainFrame;
 
 import java.util.List;
@@ -48,7 +49,7 @@ public class RecordGenerator {
                 default -> throw new IllegalArgumentException("Unknown mode: " + mode);
             };
 
-            DefaultConfig config = DefaultConfigFileHandler.load();
+            DefaultConfig config = GlobalConfig.defaultConfig;
             boolean useSwagger = config.isUseSwagger();
             String basePackage = config.getDomainBasePackage();
             String recordPackage = basePackage + "." + domain + ".record";

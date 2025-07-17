@@ -1,6 +1,6 @@
 package studio.geonlee.auto_creator.config.message;
 
-import studio.geonlee.auto_creator.config.DefaultConfigFileHandler;
+import studio.geonlee.auto_creator.config.setting.GlobalConfig;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -13,14 +13,13 @@ public class MessageUtil {
     private static ResourceBundle bundle;
 
     static {
-        // 최초 로딩 시 default-config.json 에서 언어 읽어서 로드
-        loadBundle(DefaultConfigFileHandler.load().getLanguage());
+        String language = GlobalConfig.defaultConfig.getLanguage();
+        loadBundle(language);
     }
 
     public static void loadBundle(String language) {
         Locale locale = switch (language.toLowerCase()) {
             case "korean", "ko" -> Locale.KOREAN;
-            case "english", "en" -> Locale.ENGLISH;
             default -> Locale.ENGLISH;
         };
         // ✅ basename 수정: message/messages

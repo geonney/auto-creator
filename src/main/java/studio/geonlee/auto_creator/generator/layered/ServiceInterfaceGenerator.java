@@ -2,8 +2,9 @@ package studio.geonlee.auto_creator.generator.layered;
 
 import studio.geonlee.auto_creator.common.record.EntityMetadata;
 import studio.geonlee.auto_creator.common.util.CaseUtils;
-import studio.geonlee.auto_creator.config.DefaultConfigFileHandler;
+import studio.geonlee.auto_creator.config.setting.DefaultConfigFileHandler;
 import studio.geonlee.auto_creator.config.dto.DefaultConfig;
+import studio.geonlee.auto_creator.config.setting.GlobalConfig;
 
 /**
  * @author GEON
@@ -12,7 +13,7 @@ import studio.geonlee.auto_creator.config.dto.DefaultConfig;
 public class ServiceInterfaceGenerator {
 
     public static String generate(EntityMetadata meta) {
-        DefaultConfig config = DefaultConfigFileHandler.load();
+        DefaultConfig config = GlobalConfig.defaultConfig;
         String basePackage = config.getDomainBasePackage();
         String tableName = meta.tableName().toLowerCase();
         String domain = CaseUtils.extractDomain(tableName);

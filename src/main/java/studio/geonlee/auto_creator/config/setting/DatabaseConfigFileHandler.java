@@ -1,4 +1,4 @@
-package studio.geonlee.auto_creator.config;
+package studio.geonlee.auto_creator.config.setting;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,7 +26,7 @@ public class DatabaseConfigFileHandler {
             .defaultDateFormat(new StdDateFormat())
             .build();
 
-    public static DatabaseConfig load() {
+    public DatabaseConfig load() {
         try {
             File databaseConfigFile = ConfigPathHelper.getUserDatabaseConfigFile();
             return mapper.readValue(databaseConfigFile, DatabaseConfig.class);
@@ -36,7 +36,7 @@ public class DatabaseConfigFileHandler {
         }
     }
 
-    public static void save(DatabaseConfig config) {
+    public void save(DatabaseConfig config) {
         try {
             File userFile = ConfigPathHelper.getUserDatabaseConfigFile();
             mapper.writeValue(userFile, config);

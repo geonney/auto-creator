@@ -2,13 +2,14 @@ package studio.geonlee.auto_creator.generator.layered;
 
 import studio.geonlee.auto_creator.common.record.EntityMetadata;
 import studio.geonlee.auto_creator.common.util.CaseUtils;
-import studio.geonlee.auto_creator.config.DefaultConfigFileHandler;
+import studio.geonlee.auto_creator.config.setting.DefaultConfigFileHandler;
 import studio.geonlee.auto_creator.config.dto.DefaultConfig;
+import studio.geonlee.auto_creator.config.setting.GlobalConfig;
 
 public class ControllerGenerator {
 
     public static String generate(EntityMetadata meta) {
-        DefaultConfig config = DefaultConfigFileHandler.load();
+        DefaultConfig config = GlobalConfig.defaultConfig;
         boolean useSwagger = config.isUseSwagger();
 
         String domainBasePackage = config.getDomainBasePackage();

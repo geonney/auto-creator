@@ -4,8 +4,8 @@ import studio.geonlee.auto_creator.common.enumeration.DatabaseType;
 import studio.geonlee.auto_creator.common.record.FieldMetadata;
 import studio.geonlee.auto_creator.common.util.CaseUtils;
 import studio.geonlee.auto_creator.common.util.DatabaseMetaReader;
-import studio.geonlee.auto_creator.config.DefaultConfigFileHandler;
 import studio.geonlee.auto_creator.config.dto.DefaultConfig;
+import studio.geonlee.auto_creator.config.setting.GlobalConfig;
 
 import java.util.List;
 
@@ -26,7 +26,7 @@ public class EntityCodeGenerator {
 
             StringBuilder sb = new StringBuilder();
 
-            DefaultConfig config = DefaultConfigFileHandler.load();
+            DefaultConfig config = GlobalConfig.defaultConfig;
             String entityBasePackage = config.getEntityBasePackage();
 
             sb.append("package ").append(entityBasePackage).append(";").append("\n\n");

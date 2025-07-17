@@ -2,11 +2,10 @@ package studio.geonlee.auto_creator.ui.dialog;
 
 import studio.geonlee.auto_creator.common.enumeration.DatabaseType;
 import studio.geonlee.auto_creator.common.enumeration.LogType;
-import studio.geonlee.auto_creator.config.DatabaseConfigFileHandler;
-import studio.geonlee.auto_creator.config.DefaultConfigFileHandler;
+import studio.geonlee.auto_creator.config.setting.DatabaseConfigFileHandler;
 import studio.geonlee.auto_creator.config.dto.DatabaseConfig;
-import studio.geonlee.auto_creator.config.dto.DefaultConfig;
 import studio.geonlee.auto_creator.config.message.MessageUtil;
+import studio.geonlee.auto_creator.config.setting.GlobalConfig;
 import studio.geonlee.auto_creator.context.DatabaseContext;
 import studio.geonlee.auto_creator.ui.frame.MainFrame;
 
@@ -50,9 +49,8 @@ public class DatabaseConnectionDialog extends JDialog {
                 portField.setText(String.valueOf(selected.getDefaultPort()));
             }
         });
-        DefaultConfig config = DefaultConfigFileHandler.load();
-        if (!config.isAutoLoadDatabaseOnStart()) {
-            DatabaseConfig loaded = DatabaseConfigFileHandler.load();
+        if (!GlobalConfig.defaultConfig.isAutoLoadDatabaseOnStart()) {
+            DatabaseConfig loaded = GlobalConfig.databaseConfig;
             if (loaded != null) {
                 databaseTypeCombo.setSelectedItem(DatabaseType.valueOf(loaded.getDatabaseType()));
                 hostField.setText(loaded.getHost());
@@ -148,7 +146,8 @@ public class DatabaseConnectionDialog extends JDialog {
             MainFrame.log(MessageUtil.get("database.connection.success") + ": " + selectedDatabase,
                     LogType.INFO);
             dispose();
-            DatabaseConfigFileHandler.save(new DatabaseConfig(
+            DatabaseConfigFileHandler databaseConfigFileHandler = new DatabaseConfigFileHandler();
+            databaseConfigFileHandler.save(new DatabaseConfig(
                     databaseType.name(),
                     hostField.getText(),
                     Integer.parseInt(portField.getText()),

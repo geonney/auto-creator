@@ -1,4 +1,4 @@
-package studio.geonlee.auto_creator.config;
+package studio.geonlee.auto_creator.config.setting;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,7 +26,7 @@ public class DefaultConfigFileHandler {
             .defaultDateFormat(new StdDateFormat())         // ✅ ISO 표준 날짜 포맷
             .build();
 
-    public static DefaultConfig load() {
+    public DefaultConfig load() {
         try {
             File defaultConfigFile = ConfigPathHelper.getUserDefaultConfigFile();
             return mapper.readValue(defaultConfigFile, DefaultConfig.class);
@@ -37,7 +37,7 @@ public class DefaultConfigFileHandler {
         }
     }
 
-    public static void save(DefaultConfig config) {
+    public void save(DefaultConfig config) {
         try {
             File userFile = ConfigPathHelper.getUserDefaultConfigFile();
             mapper.writeValue(userFile, config);

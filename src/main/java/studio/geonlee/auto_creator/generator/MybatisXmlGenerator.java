@@ -2,8 +2,9 @@ package studio.geonlee.auto_creator.generator;
 
 import studio.geonlee.auto_creator.common.record.EntityMetadata;
 import studio.geonlee.auto_creator.common.record.FieldMetadata;
-import studio.geonlee.auto_creator.config.DefaultConfigFileHandler;
+import studio.geonlee.auto_creator.config.setting.DefaultConfigFileHandler;
 import studio.geonlee.auto_creator.config.dto.DefaultConfig;
+import studio.geonlee.auto_creator.config.setting.GlobalConfig;
 
 import java.util.List;
 
@@ -14,7 +15,7 @@ import java.util.List;
 public class MybatisXmlGenerator {
 
     public static String generate(EntityMetadata meta) {
-        DefaultConfig config = DefaultConfigFileHandler.load();
+        DefaultConfig config = GlobalConfig.defaultConfig;
         String basePackage = config.getDomainBasePackage();
         String domainPackage = basePackage + "." + meta.tableName().toLowerCase();
         String entityName = meta.baseClassName();

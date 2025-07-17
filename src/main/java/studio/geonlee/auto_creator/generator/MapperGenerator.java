@@ -1,8 +1,9 @@
 package studio.geonlee.auto_creator.generator;
 
 import studio.geonlee.auto_creator.common.record.EntityMetadata;
-import studio.geonlee.auto_creator.config.DefaultConfigFileHandler;
+import studio.geonlee.auto_creator.config.setting.DefaultConfigFileHandler;
 import studio.geonlee.auto_creator.config.dto.DefaultConfig;
+import studio.geonlee.auto_creator.config.setting.GlobalConfig;
 
 /**
  * @author GEON
@@ -11,7 +12,7 @@ import studio.geonlee.auto_creator.config.dto.DefaultConfig;
 public class MapperGenerator {
 
     public static String generate(EntityMetadata meta) {
-        DefaultConfig config = DefaultConfigFileHandler.load();
+        DefaultConfig config = GlobalConfig.defaultConfig;
         String basePackage = config.getDomainBasePackage();
         String domain = meta.tableName().toLowerCase();
         String fullPackage = basePackage + "." + domain;

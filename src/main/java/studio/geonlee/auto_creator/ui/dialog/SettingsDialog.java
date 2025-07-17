@@ -49,7 +49,7 @@ public class SettingsDialog extends JDialog {
         cardLayout = new CardLayout();
         detailPanel = new JPanel(cardLayout);
 
-        detailPanel.add(new GeneralSettingPanel(), "General");
+        detailPanel.add(new GeneralSettingPanel(mainFrame), "General");
         detailPanel.add(new GeneratorSettingPanel(mainFrame), "Generator");
 //        detailPanel.add(new JPanel(), MessageUtil.get("tree.setting.database"));
 

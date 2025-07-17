@@ -1,4 +1,4 @@
-package studio.geonlee.auto_creator.config;
+package studio.geonlee.auto_creator.config.setting;
 
 import lombok.extern.slf4j.Slf4j;
 
