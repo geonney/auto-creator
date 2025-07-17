@@ -20,6 +20,8 @@ import studio.geonlee.auto_creator.ui.frame.MainFrame;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -110,6 +112,38 @@ public class CodeGeneratorPanel extends JPanel {
 
         // ✅ ORM에 따라 버튼/메뉴 가시성 초기 세팅
         refreshOrmSettings();
+
+        // 팝업 메뉴 생성
+        JPopupMenu popupMenu = new JPopupMenu();
+        JMenuItem copyItem = new JMenuItem(MessageUtil.get("button.copy"));
+        JMenuItem clearItem = new JMenuItem(MessageUtil.get("button.clear"));
+        popupMenu.add(copyItem);
+        popupMenu.add(clearItem);
+        copyItem.addActionListener(e -> {
+            copyCode();
+        });
+        clearItem.addActionListener(e -> {
+            clear();
+        });
+
+        // 트리에 마우스 리스너 추가
+        previewArea.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                showPopup(e);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                showPopup(e);
+            }
+
+            private void showPopup(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    popupMenu.show(previewArea, e.getX(), e.getY()); // 팝업 표시
+                }
+            }
+        });
     }
 
     // ✅ Entity 코드 생성
@@ -402,6 +436,10 @@ public class CodeGeneratorPanel extends JPanel {
                 .setContents(new java.awt.datatransfer.StringSelection(code), null);
 
         MainFrame.log(MessageUtil.get("code.copy.success"), LogType.INFO);
+    }
+
+    public void clear() {
+        previewArea.setText("");
     }
 
     public void setClassNameFromTable(String tableName) {
