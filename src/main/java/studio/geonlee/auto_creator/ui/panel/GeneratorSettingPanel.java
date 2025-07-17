@@ -10,6 +10,7 @@ import studio.geonlee.auto_creator.ui.frame.MainFrame;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ItemEvent;
 
 /**
  * @author GEON
@@ -22,6 +23,9 @@ public class GeneratorSettingPanel extends JPanel {
     private final JCheckBox useSwaggerCheck = new JCheckBox(MessageUtil.get("checkbox.swagger.annotation"));
     private final JCheckBox useMapStructCheck = new JCheckBox(MessageUtil.get("checkbox.mapStruct"));
     private final JCheckBox useQueryDslCheck = new JCheckBox(MessageUtil.get("checkbox.querydsl"));
+    private final JCheckBox useBaseEntityCheck = new JCheckBox(MessageUtil.get("checkbox.baseEntity"));
+    private final JTextField baseEntityColumnField = new JTextField(30);
+    private final JPanel baseEntityFieldsPanel;
     private final MainFrame mainFrame;
 
     public GeneratorSettingPanel(MainFrame mainFrame) {
@@ -63,6 +67,35 @@ public class GeneratorSettingPanel extends JPanel {
         useQueryDslCheck.setAlignmentX(Component.LEFT_ALIGNMENT);
         add(useQueryDslCheck);
 
+        // JPA BaseEntity 사용 여부 체크박스
+        // 항목 추가
+        useBaseEntityCheck.setAlignmentX(Component.LEFT_ALIGNMENT);
+        useBaseEntityCheck.setVisible(false);
+        add(useBaseEntityCheck);
+        baseEntityColumnField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 28));
+        baseEntityFieldsPanel = createSection(
+                MessageUtil.get("baseEntity.setting"),
+                MessageUtil.get("baseEntity.setting.description"),
+                baseEntityColumnField
+        );
+        add(Box.createVerticalStrut(5));
+        add(baseEntityFieldsPanel);
+
+        // ORM 콤보박스 변경 시 BaseEntity 설정 show
+        ormComboBox.addActionListener(e -> {
+            String selected = (String) ormComboBox.getSelectedItem();
+            useBaseEntityCheck.setVisible("JPA".equals(selected));
+            baseEntityFieldsPanel.setVisible("JPA".equals(selected));
+        });
+        useBaseEntityCheck.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                baseEntityColumnField.setEnabled(true);
+            } else {
+                baseEntityColumnField.setText("");
+                baseEntityColumnField.setEnabled(false);
+            }
+        });
+
         JButton saveBtn = new JButton(MessageUtil.get("button.save"));
         saveBtn.setAlignmentX(Component.LEFT_ALIGNMENT);
         saveBtn.addActionListener(e -> saveSettings());
@@ -103,13 +136,19 @@ public class GeneratorSettingPanel extends JPanel {
     private void loadSettings() {
         DefaultConfig config = GlobalConfig.defaultConfig;
         if (config != null) {
-            architectureComboBox.setSelectedItem(config.getArchitecture().toUpperCase());
+            architectureComboBox.setSelectedItem(CaseUtils.toUppercaseFirstLetter(config.getArchitecture().toLowerCase()));
             ormComboBox.setSelectedItem(("jpa".equals(config.getOrm())
                     ? config.getOrm().toUpperCase()
                     : CaseUtils.toUppercaseFirstLetter(config.getOrm())));
             useSwaggerCheck.setSelected(config.isUseSwagger());
             useMapStructCheck.setSelected(config.isUseMapStruct());
             useQueryDslCheck.setSelected(config.isUseQueryDsl());
+            useBaseEntityCheck.setSelected(config.isUseBaseEntity());
+            baseEntityColumnField.setText(config.getBaseEntityColumnField());
+            if ("JPA".equals(ormComboBox.getSelectedItem())) {
+                useBaseEntityCheck.setVisible(true);
+                baseEntityFieldsPanel.setVisible(true);
+            }
         }
     }
 
@@ -123,6 +162,8 @@ public class GeneratorSettingPanel extends JPanel {
             config.setUseSwagger(useSwaggerCheck.isSelected());
             config.setUseMapStruct(useMapStructCheck.isSelected());
             config.setUseQueryDsl(useQueryDslCheck.isSelected());
+            config.setUseBaseEntity(useBaseEntityCheck.isSelected());
+            config.setBaseEntityColumnField(baseEntityColumnField.getText());
             DefaultConfigFileHandler defaultConfigFileHandler = new DefaultConfigFileHandler();
             defaultConfigFileHandler.save(config);
 
