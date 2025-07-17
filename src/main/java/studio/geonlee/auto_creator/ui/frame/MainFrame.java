@@ -127,9 +127,7 @@ public class MainFrame extends JFrame {
         JPopupMenu popupMenu = new JPopupMenu();
         JMenuItem actionItem = new JMenuItem(MessageUtil.get("button.refresh"));
         popupMenu.add(actionItem);
-        actionItem.addActionListener(e -> {
-            refreshTableTree();
-        });
+        actionItem.addActionListener(e -> refreshTableTree());
 
         // 트리에 마우스 리스너 추가
         tableTree.addMouseListener(new MouseAdapter() {

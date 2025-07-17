@@ -119,12 +119,8 @@ public class CodeGeneratorPanel extends JPanel {
         JMenuItem clearItem = new JMenuItem(MessageUtil.get("button.clear"));
         popupMenu.add(copyItem);
         popupMenu.add(clearItem);
-        copyItem.addActionListener(e -> {
-            copyCode();
-        });
-        clearItem.addActionListener(e -> {
-            clear();
-        });
+        copyItem.addActionListener(e -> copyCode());
+        clearItem.addActionListener(e -> clear());
 
         // 트리에 마우스 리스너 추가
         previewArea.addMouseListener(new MouseAdapter() {
