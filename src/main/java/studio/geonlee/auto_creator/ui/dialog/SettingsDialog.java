@@ -10,6 +10,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 
 /**
  * @author GEON
@@ -49,7 +50,7 @@ public class SettingsDialog extends JDialog {
         cardLayout = new CardLayout();
         detailPanel = new JPanel(cardLayout);
 
-        detailPanel.add(new GeneralSettingPanel(mainFrame), "General");
+        detailPanel.add(new GeneralSettingPanel(), "General");
         detailPanel.add(new GeneratorSettingPanel(mainFrame), "Generator");
 //        detailPanel.add(new JPanel(), MessageUtil.get("tree.setting.database"));
 
@@ -88,5 +89,15 @@ public class SettingsDialog extends JDialog {
 
         // 4. 초기 선택 General
         menuTree.setSelectionPath(new TreePath(generalNode.getPath()));
+
+        // ESC 키 입력 처리 추가
+        getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+                .put(KeyStroke.getKeyStroke("ESCAPE"), "closeDialog");
+        getRootPane().getActionMap().put("closeDialog", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose(); // 다이얼로그 닫기
+            }
+        });
     }
 }

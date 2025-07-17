@@ -11,6 +11,7 @@ import studio.geonlee.auto_creator.ui.frame.MainFrame;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -59,6 +60,16 @@ public class DatabaseConnectionDialog extends JDialog {
                 passwordField.setText(loaded.getPassword());
             }
         }
+
+        // ESC 키 입력 처리 추가
+        getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+                .put(KeyStroke.getKeyStroke("ESCAPE"), "closeDialog");
+        getRootPane().getActionMap().put("closeDialog", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose(); // 다이얼로그 닫기
+            }
+        });
     }
 
     private JPanel createFormPanel() {

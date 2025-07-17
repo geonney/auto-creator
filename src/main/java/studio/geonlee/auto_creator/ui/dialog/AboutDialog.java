@@ -2,6 +2,7 @@ package studio.geonlee.auto_creator.ui.dialog;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.util.Objects;
 
 /**
@@ -30,7 +31,7 @@ public class AboutDialog extends JDialog {
         // ✨ 살짝 아래로 내리는 여백
         textPanel.add(Box.createVerticalStrut(10));
 
-        JLabel titleLabel = new JLabel("Auto Code (v0.0.1)");
+        JLabel titleLabel = new JLabel("Auto Code (v0.1.0)");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
         titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
@@ -61,5 +62,15 @@ public class AboutDialog extends JDialog {
         setSize(450, 220);
         setResizable(false);
         setLocationRelativeTo(owner);
+
+        // ESC 키 입력 처리 추가
+        getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+                .put(KeyStroke.getKeyStroke("ESCAPE"), "closeDialog");
+        getRootPane().getActionMap().put("closeDialog", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose(); // 다이얼로그 닫기
+            }
+        });
     }
 }
