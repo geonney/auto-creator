@@ -17,7 +17,7 @@ public class AboutDialog extends JDialog {
 
         // 왼쪽 아이콘
         JLabel iconLabel = new JLabel();
-        ImageIcon icon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/icon/ac_icon_96x96_brighter.png"))); // 아이콘 경로 맞게
+        ImageIcon icon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/icon/splash_screen 150x100.png"))); // 아이콘 경로 맞게
         iconLabel.setIcon(icon);
         iconLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         iconLabel.setAlignmentY(Component.TOP_ALIGNMENT);

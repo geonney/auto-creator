@@ -43,7 +43,8 @@ public class MainFrame extends JFrame {
 
     public MainFrame() {
         instance = this;
-        setTitle("🔧 Auto Code");
+
+        setTitle("⚙ Auto-code");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             @Override
