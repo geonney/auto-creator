@@ -7,6 +7,7 @@ import studio.geonlee.auto_creator.common.util.DatabaseMetaReader;
 import studio.geonlee.auto_creator.config.dto.DefaultConfig;
 import studio.geonlee.auto_creator.config.setting.GlobalConfig;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -28,8 +29,12 @@ public class EntityCodeGenerator {
 
             DefaultConfig config = GlobalConfig.defaultConfig;
             String entityBasePackage = config.getEntityBasePackage();
-
+            String baseEntityPackage = entityBasePackage + (".base");
+            List<String> baseEntityFields = Arrays.asList(config.getBaseEntityColumnField().replaceAll("\\s", "").split(","));
             sb.append("package ").append(entityBasePackage).append(";").append("\n\n");
+            if (config.isUseBaseEntity()) {
+                sb.append("import ").append(baseEntityPackage).append(".BaseEntity;").append("\n\n");
+            }
             sb.append("import jakarta.persistence.*;\n");
             sb.append("import lombok.Getter;\n");
             sb.append("import lombok.NoArgsConstructor;\n");
@@ -44,7 +49,11 @@ public class EntityCodeGenerator {
 
             sb.append("@Getter\n@Entity\n@NoArgsConstructor\n");
             sb.append("@Table(name = \"").append(tableName).append("\")\n");
-            sb.append("public class ").append(className).append(" {\n\n");
+            sb.append("public class ").append(className);
+            if (config.isUseBaseEntity()) {
+                sb.append(" extends BaseEntity");
+            }
+            sb.append(" {\n\n");
 
             // 복합키 처리
             if (isCompositePk) {
@@ -63,6 +72,9 @@ public class EntityCodeGenerator {
 
             // 나머지 필드
             for (FieldMetadata field : nonPkFields) {
+                if (config.isUseBaseEntity() && baseEntityFields.contains(field.fieldName())) {
+                    continue;
+                }
                 if (field.comment() != null && !field.comment().isBlank()) {
                     sb.append("    /** ").append(field.comment()).append(" */\n");
                 }
@@ -73,13 +85,14 @@ public class EntityCodeGenerator {
             //생성자
             sb.append("    /** ").append("""
                     생성자, modify 메서드에서 제외 해야하는 필드 목록
-                            1. BaseEntity field.
-                            2. @LastModifiedBy 를 추가할 field.
-                            3. AuditorAware 필드
+                            1. @CreatedBy, @LastModifiedBy, @CreatedDate, @LastModifiedDate가 추가된 Field.
                     """).append("   */\n");
             sb.append("    public ").append(className).append("(").append(CaseUtils.toUppercaseFirstLetter(domain))
                     .append("CreateRequestRecord").append(" request) {\n");
             for (FieldMetadata field : nonPkFields) {
+                if (config.isUseBaseEntity() && baseEntityFields.contains(field.fieldName())) {
+                    continue;
+                }
                 sb.append("        this.").append(field.fieldName())
                         .append(" = request.").append(field.fieldName()).append("();\n");
             }
@@ -88,6 +101,9 @@ public class EntityCodeGenerator {
             sb.append("    public ").append("void modify(").append(CaseUtils.toUppercaseFirstLetter(domain))
                     .append("ModifyRequestRecord").append(" request) {\n");
             for (FieldMetadata field : nonPkFields) {
+                if (config.isUseBaseEntity() && baseEntityFields.contains(field.fieldName())) {
+                    continue;
+                }
                 sb.append("        this.").append(field.fieldName())
                         .append(" = request.").append(field.fieldName()).append("();\n");
             }

@@ -23,6 +23,8 @@ public class DefaultConfig {
     private boolean useSwagger;
     private boolean useMapStruct;
     private boolean useQueryDsl;
+    private boolean useBaseEntity;
+    private String baseEntityColumnField;
     private String language;
     private String architecture;
     private String orm;

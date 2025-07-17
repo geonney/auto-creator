@@ -1,9 +1,9 @@
 package studio.geonlee.auto_creator.ui.panel;
 
 import studio.geonlee.auto_creator.common.enumeration.LogType;
-import studio.geonlee.auto_creator.config.setting.DefaultConfigFileHandler;
 import studio.geonlee.auto_creator.config.dto.DefaultConfig;
 import studio.geonlee.auto_creator.config.message.MessageUtil;
+import studio.geonlee.auto_creator.config.setting.DefaultConfigFileHandler;
 import studio.geonlee.auto_creator.config.setting.GlobalConfig;
 import studio.geonlee.auto_creator.ui.frame.MainFrame;
 
@@ -24,10 +24,8 @@ public class GeneralSettingPanel extends JPanel {
     private final JCheckBox autoLoadDatabaseCheck = new JCheckBox(MessageUtil.get("checkbox.reload.last.database"));
     private final JCheckBox expandTreeCheck = new JCheckBox(MessageUtil.get("checkbox.expand.tree"));
     private final JComboBox<String> languageComboBox;
-    private final MainFrame mainFrame;
 
-    public GeneralSettingPanel(MainFrame mainFrame) {
-        this.mainFrame = mainFrame;
+    public GeneralSettingPanel() {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
         setAlignmentX(Component.LEFT_ALIGNMENT);
