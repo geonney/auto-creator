@@ -62,11 +62,6 @@ public class MainFrame extends JFrame {
             log.error("Icon setting Failure: {}", e.getMessage());
         }
 
-        //설정 파일 로드
-        DatabaseConfigFileHandler databaseConfigFileHandler = new DatabaseConfigFileHandler();
-        DefaultConfigFileHandler defaultConfigFileHandler = new DefaultConfigFileHandler();
-        GlobalConfig.defaultConfig = defaultConfigFileHandler.load();
-        GlobalConfig.databaseConfig = databaseConfigFileHandler.load();
         setMinimumSize(new Dimension(1070, 800));
         if (GlobalConfig.defaultConfig != null && GlobalConfig.defaultConfig.getWindowWidth() > 0
                 && GlobalConfig.defaultConfig.getWindowHeight() > 0) {

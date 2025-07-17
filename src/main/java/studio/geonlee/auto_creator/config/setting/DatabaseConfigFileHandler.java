@@ -26,13 +26,13 @@ public class DatabaseConfigFileHandler {
             .defaultDateFormat(new StdDateFormat())
             .build();
 
-    public DatabaseConfig load() {
+    public DatabaseConfig load() throws IOException {
         try {
             File databaseConfigFile = ConfigPathHelper.getUserDatabaseConfigFile();
             return mapper.readValue(databaseConfigFile, DatabaseConfig.class);
         } catch (IOException e) {
             MainFrame.log("❌ 데이터베이스 설정 파일 로딩 실패: " + e.getMessage(), LogType.EXCEPTION);
-            return null;
+            throw e;
         }
     }
 
