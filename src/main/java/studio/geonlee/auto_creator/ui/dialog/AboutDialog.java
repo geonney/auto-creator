@@ -38,6 +38,9 @@ public class AboutDialog extends JDialog {
         JLabel javaVersionLabel = new JLabel("Java Version: " + System.getProperty("java.version"));
         javaVersionLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
+        JLabel developByLabel = new JLabel("Develop by: GEONLEE");
+        javaVersionLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
         JLabel githubLabel = new JLabel("<html>GitHub: <a href='https://github.com/geonney'>https://github.com/geonney</a></html>");
         githubLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
         githubLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -45,6 +48,7 @@ public class AboutDialog extends JDialog {
         textPanel.add(titleLabel);
         textPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         textPanel.add(javaVersionLabel);
+        textPanel.add(developByLabel);
         textPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         textPanel.add(githubLabel);
 
