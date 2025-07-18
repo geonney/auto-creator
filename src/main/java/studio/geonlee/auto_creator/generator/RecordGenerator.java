@@ -6,11 +6,12 @@ import studio.geonlee.auto_creator.common.record.FieldMetadata;
 import studio.geonlee.auto_creator.common.util.CaseUtils;
 import studio.geonlee.auto_creator.common.util.DatabaseMetaReader;
 import studio.geonlee.auto_creator.common.util.NamingUtils;
-import studio.geonlee.auto_creator.config.setting.DefaultConfigFileHandler;
 import studio.geonlee.auto_creator.config.dto.DefaultConfig;
 import studio.geonlee.auto_creator.config.setting.GlobalConfig;
 import studio.geonlee.auto_creator.ui.frame.MainFrame;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -50,10 +51,17 @@ public class RecordGenerator {
                 default -> throw new IllegalArgumentException("Unknown mode: " + mode);
             };
 
+            List<String> baseEntityExceptionAction = List.of("create", "modify");
+
             DefaultConfig config = GlobalConfig.defaultConfig;
             boolean useSwagger = config.isUseSwagger();
             String basePackage = config.getDomainBasePackage();
             String recordPackage = basePackage + "." + domain + ".record";
+            List<String> baseEntityFields = new ArrayList<>();
+            if (!config.getBaseEntityColumnField().trim().isEmpty()) {
+                baseEntityFields = Arrays.asList(config.getBaseEntityColumnField()
+                        .replaceAll("\\s", "").split(","));
+            }
 
             StringBuilder sb = new StringBuilder();
             sb.append("package ").append(recordPackage).append(";").append("\n\n");
@@ -66,7 +74,11 @@ public class RecordGenerator {
             }
             if (hasTime(selectedFields)) {
                 sb.append("import java.time.*;\n");
-                sb.append("import com.fasterxml.jackson.annotation.JsonFormat;\n");
+                if (isRequest) {
+                    sb.append("import org.springframework.format.annotation.DateTimeFormat;\n");
+                } else {
+                    sb.append("import com.fasterxml.jackson.annotation.JsonFormat;\n");
+                }
             }
             if (useSwagger) {
                 sb.append("import io.swagger.v3.oas.annotations.media.Schema;\n\n");
@@ -81,7 +93,12 @@ public class RecordGenerator {
                 FieldMetadata field = selectedFields.get(i);
 //                String fieldType = convertFieldType(field.javaType(), isRequest);
                 String fieldType = field.javaType();
-
+                if (baseEntityExceptionAction.contains(action.toLowerCase())
+                        && isRequest
+                        && config.isUseBaseEntity()
+                        && baseEntityFields.contains(field.fieldName())) {
+                    continue;
+                }
                 // ✅ 주석 (swagger 사용하지 않을 경우 주석으로 필드 comment 추가)
                 if (!useSwagger && field.comment() != null) {
                     sb.append("    /** ").append(field.comment()).append(" */\n");

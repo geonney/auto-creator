@@ -3,7 +3,6 @@ package studio.geonlee.auto_creator.generator.layered;
 import studio.geonlee.auto_creator.common.record.EntityMetadata;
 import studio.geonlee.auto_creator.common.util.CaseUtils;
 import studio.geonlee.auto_creator.common.util.NamingUtils;
-import studio.geonlee.auto_creator.config.setting.DefaultConfigFileHandler;
 import studio.geonlee.auto_creator.config.dto.DefaultConfig;
 import studio.geonlee.auto_creator.config.setting.GlobalConfig;
 
@@ -25,11 +24,13 @@ public class ControllerGenerator {
         sb.append("package ").append(fullPackage).append(";\n\n");
 
         sb.append("import lombok.RequiredArgsConstructor;\n");
+        sb.append("import org.springdoc.core.annotations.ParameterObject;\n");
         sb.append("import jakarta.validation.Valid;\n");
         sb.append("import org.springframework.web.bind.annotation.*;\n");
         sb.append("import org.springframework.http.ResponseEntity;\n");
         sb.append("import org.springframework.data.domain.Page;\n");
         sb.append("import org.springframework.data.domain.Pageable;\n");
+        sb.append("import org.springframework.data.web.PageableDefault;\n");
         sb.append("import ").append(basePackage).append(".common.response").append(".ItemResponse;\n");
         sb.append("import ").append(basePackage).append(".common.response").append(".ItemsResponse;\n");
         sb.append("import ").append(basePackage).append(".common.response").append(".GridResponse;\n");

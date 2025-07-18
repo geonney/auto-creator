@@ -22,7 +22,6 @@ public class EntityCodeGenerator {
 
     public static String generate(String className, String tableName, String schema, DatabaseType databaseType) {
         try {
-            String domain = tableName.substring(tableName.lastIndexOf('_') + 1);
             List<FieldMetadata> fields = DatabaseMetaReader.readTableFields(schema, tableName, databaseType);
             List<FieldMetadata> pkFields = fields.stream().filter(FieldMetadata::primaryKey).toList();
             List<FieldMetadata> nonPkFields = fields.stream().filter(f -> !f.primaryKey()).toList();
@@ -32,19 +31,23 @@ public class EntityCodeGenerator {
             StringBuilder sb = new StringBuilder();
 
             DefaultConfig config = GlobalConfig.defaultConfig;
-            System.out.println(config.getBaseEntityColumnField());
             String entityBasePackage = config.getEntityBasePackage();
             String baseEntityPackage = entityBasePackage + (".base");
+            String domain = NamingUtils.convertFullNaming(CaseUtils.extractDomain(tableName));
+            String domainPackage = config.getDomainBasePackage() + "." + domain;
+            String pascalDomain = CaseUtils.toUppercaseFirstLetter(NamingUtils.convertFullNaming(domain));
+
             List<String> baseEntityFields = new ArrayList<>();
             if (!config.getBaseEntityColumnField().trim().isEmpty()) {
                 baseEntityFields = Arrays.asList(config.getBaseEntityColumnField()
                         .replaceAll("\\s", "").split(","));
             }
-            System.out.println(baseEntityFields);
             sb.append("package ").append(entityBasePackage).append(";").append("\n\n");
             if (config.isUseBaseEntity()) {
                 sb.append("import ").append(baseEntityPackage).append(".BaseEntity;").append("\n\n");
             }
+            sb.append("import ").append(domainPackage).append(".record.").append(pascalDomain).append("CreateRequestRecord;\n");
+            sb.append("import ").append(domainPackage).append(".record.").append(pascalDomain).append("ModifyRequestRecord;\n");
             sb.append("import jakarta.persistence.*;\n");
             sb.append("import lombok.Getter;\n");
             sb.append("import lombok.NoArgsConstructor;\n");

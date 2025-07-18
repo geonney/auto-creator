@@ -31,11 +31,12 @@ public class QueryDslRepositoryImplGenerator {
                 .append(";\n");
         sb.append("import com.querydsl.jpa.JPQLQuery;\n");
         sb.append("import com.querydsl.jpa.impl.JPAQueryFactory;\n");
-        sb.append("import import lombok.RequiredArgsConstructor;\n");
+        sb.append("import lombok.RequiredArgsConstructor;\n");
         sb.append("import org.springframework.data.domain.Page;\n");
         sb.append("import org.springframework.data.domain.PageImpl;\n");
         sb.append("import org.springframework.data.domain.Pageable;\n");
-        sb.append("import import org.springframework.stereotype.Repository;\n");
+        sb.append("import org.springframework.stereotype.Repository;\n");
+        sb.append("import java.util.List;\n");
         sb.append("\n");
 
         sb.append("@RequiredArgsConstructor\n@Repository\n");

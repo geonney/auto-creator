@@ -116,17 +116,23 @@ public class DatabaseConnectionDialog extends JDialog {
             String url = Objects.requireNonNull(databaseType).formatUrl(hostField.getText(), Integer.parseInt(portField.getText()));
 
             // TODO 타 DB 관련 처리 필요. 현재 postgresql 만 가능.
-            if (databaseType == DatabaseType.POSTGRESQL) {
-                url += "postgres";
-            } else {
-                JOptionPane.showMessageDialog(this,
-                        "⚠️ " + databaseType + MessageUtil.get("not.supported.database"),
-                        "Warning", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
+            String dbNameForUrl = switch (databaseType) {
+                case POSTGRESQL -> "postgres";
+                case MARIADB, MYSQL -> ""; // 접속 시 DB 이름 없이 가능
+                case ORACLE -> "xe"; // 환경에 따라 "ORCL", "xe" 등으로 변경 가능
+            };
+            url += dbNameForUrl;
+//            if (databaseType == DatabaseType.POSTGRESQL) {
+//
+//            } else {
+//                JOptionPane.showMessageDialog(this,
+//                        "⚠️ " + databaseType + MessageUtil.get("not.supported.database"),
+//                        "Warning", JOptionPane.WARNING_MESSAGE);
+//                return;
+//            }
 
             connection = DriverManager.getConnection(url, userField.getText(), new String(passwordField.getPassword()));
-            ResultSet rs = connection.createStatement().executeQuery("SELECT datname FROM pg_database WHERE datistemplate = false");
+            ResultSet rs = connection.createStatement().executeQuery(databaseType.getDatabaseListQuery());
 
             databaseCombo.removeAllItems();
             while (rs.next()) {
@@ -137,6 +143,7 @@ public class DatabaseConnectionDialog extends JDialog {
         } catch (Exception ex) {
             MainFrame.log(MessageUtil.get("database.list.load.failure") + ": " + ex.getMessage(),
                     LogType.EXCEPTION);
+            databaseCombo.removeAllItems();
             JOptionPane.showMessageDialog(this,
                     MessageUtil.get("database.list.load.failure") + ".\n" + ex.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);

@@ -127,7 +127,7 @@ public class DictionaryPanel extends JPanel {
             String key = String.valueOf(tableModel.getValueAt(i, 0)).trim();
             String value = String.valueOf(tableModel.getValueAt(i, 1)).trim();
             if (!key.isEmpty() && !value.isEmpty()) {
-                updatedDictionary.put(key, value);
+                updatedDictionary.put(key, value.trim());
             }
         }
         GlobalConfig.dictionary = updatedDictionary;

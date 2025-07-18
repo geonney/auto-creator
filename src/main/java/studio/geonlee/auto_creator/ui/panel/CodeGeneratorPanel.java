@@ -7,6 +7,7 @@ import studio.geonlee.auto_creator.common.record.EntityMetadata;
 import studio.geonlee.auto_creator.common.record.FieldMetadata;
 import studio.geonlee.auto_creator.common.util.CaseUtils;
 import studio.geonlee.auto_creator.common.util.DatabaseMetaReader;
+import studio.geonlee.auto_creator.common.util.NamingUtils;
 import studio.geonlee.auto_creator.config.dto.DefaultConfig;
 import studio.geonlee.auto_creator.config.message.MessageUtil;
 import studio.geonlee.auto_creator.config.setting.GlobalConfig;
@@ -22,8 +23,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,6 +37,7 @@ public class CodeGeneratorPanel extends JPanel {
     private final JTextField classNameField = new JTextField(20);
     private final JTextArea previewArea = new JTextArea();
     private CodeType currentCodeType;
+    private String pascalDomain;
 
     private final JButton entityButton;
     private final JButton recordButton;
@@ -377,6 +379,7 @@ public class CodeGeneratorPanel extends JPanel {
             return;
         }
 
+
         String defaultName = switch (currentCodeType) {
             case RECORD_CREATE_REQUEST -> classNameField.getText().trim() + "CreateRequestRecord.java";
             case RECORD_CREATE_RESPONSE -> classNameField.getText().trim() + "CreateResponseRecord.java";
@@ -392,21 +395,39 @@ public class CodeGeneratorPanel extends JPanel {
             case REPOSITORY -> classNameField.getText().trim() + "Repository.java";
             case MAPSTRUCT_MAPPER, MAPPER -> classNameField.getText().trim() + "Mapper.java";
             case XML -> classNameField.getText().trim() + "Mapper.xml";
-            default -> classNameField.getText().trim() + ".java";
+            default -> classNameField + ".java";
         };
 
-        String fileName = JOptionPane.showInputDialog(this, MessageUtil.get("save.file.name"), defaultName);
+        String downloadPath = GlobalConfig.defaultConfig.getDefaultSavePath();
+        String fileName = JOptionPane.showInputDialog(this, downloadPath, defaultName);
         if (fileName == null || fileName.isBlank()) return;
 
-        JFileChooser chooser = new JFileChooser();
-        chooser.setSelectedFile(new java.io.File(fileName));
+        if (downloadPath.isEmpty()) {
+            // 경로가 없는 경우: 사용자에게 직접 저장 위치를 받는다
+            JFileChooser chooser = new JFileChooser();
+            chooser.setSelectedFile(new File(fileName));
 
-        int result = chooser.showSaveDialog(this);
-        if (result == JFileChooser.APPROVE_OPTION) {
-            try (FileWriter writer = new FileWriter(chooser.getSelectedFile())) {
+            int result = chooser.showSaveDialog(this);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                try (Writer writer = new OutputStreamWriter(new FileOutputStream(chooser.getSelectedFile()), StandardCharsets.UTF_8)) {
+                    writer.write(code);
+                    MainFrame.log(MessageUtil.get("file.save.success") + ": " +
+                            chooser.getSelectedFile().getAbsolutePath(), LogType.INFO);
+                } catch (IOException ex) {
+                    MainFrame.log(MessageUtil.get("file.save.failure") + ": " + ex.getMessage(),
+                            LogType.EXCEPTION);
+                    JOptionPane.showMessageDialog(this,
+                            MessageUtil.get("file.save.failure") + ".\n" + ex.getMessage(),
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        } else {
+            // 경로가 있는 경우: 해당 디렉토리에 파일 저장
+            File saveFile = new File(downloadPath, fileName);
+            try (Writer writer = new OutputStreamWriter(new FileOutputStream(saveFile), StandardCharsets.UTF_8)) {
                 writer.write(code);
                 MainFrame.log(MessageUtil.get("file.save.success") + ": " +
-                        chooser.getSelectedFile().getAbsolutePath(), LogType.INFO);
+                        saveFile.getAbsolutePath(), LogType.INFO);
             } catch (IOException ex) {
                 MainFrame.log(MessageUtil.get("file.save.failure") + ": " + ex.getMessage(),
                         LogType.EXCEPTION);
@@ -439,7 +460,8 @@ public class CodeGeneratorPanel extends JPanel {
     }
 
     public void setClassNameFromTable(String tableName) {
-        String entityName = CaseUtils.toUppercaseFirstLetter(tableName);
-        classNameField.setText(entityName);
+        String domain = NamingUtils.convertFullNaming(CaseUtils.extractDomain(tableName));
+        this.pascalDomain = CaseUtils.toUppercaseFirstLetter(NamingUtils.convertFullNaming(domain));
+        classNameField.setText(CaseUtils.toUppercaseFirstLetter(tableName));
     }
 }

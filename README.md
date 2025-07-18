@@ -1,2 +1,5 @@
-# auto-creator
-백엔드 API의 기본 MVC 모델 코드부터 Entity, Record, Test code 까지 자동 생성해주는 프로젝트
+![Static Badge](https://img.shields.io/badge/OpenJDK-v17.0.2-blue)
+
+# Auto-code
+- 백앤드 코드 자동 생성 어플리케이션
+- Swing 기반 GUI 프로젝트
