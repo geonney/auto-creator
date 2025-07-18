@@ -5,6 +5,7 @@ import studio.geonlee.auto_creator.common.enumeration.LogType;
 import studio.geonlee.auto_creator.common.record.FieldMetadata;
 import studio.geonlee.auto_creator.common.util.CaseUtils;
 import studio.geonlee.auto_creator.common.util.DatabaseMetaReader;
+import studio.geonlee.auto_creator.common.util.NamingUtils;
 import studio.geonlee.auto_creator.config.setting.DefaultConfigFileHandler;
 import studio.geonlee.auto_creator.config.dto.DefaultConfig;
 import studio.geonlee.auto_creator.config.setting.GlobalConfig;
@@ -33,7 +34,7 @@ public class RecordGenerator {
             boolean isRequest = mode.endsWith("-request");
             String action = mode.split("-")[0]; // "create", "update", "delete", "search"
             String domain = CaseUtils.extractDomain(tableName);
-            String pascalDomain = CaseUtils.toUppercaseFirstLetter(domain);
+            String pascalDomain = CaseUtils.toUppercaseFirstLetter(NamingUtils.convertFullNaming(domain));
             String recordName = pascalDomain + CaseUtils.toPascalCase(action) +
                     (isRequest ? "RequestRecord" : "ResponseRecord");
 
@@ -119,7 +120,7 @@ public class RecordGenerator {
                     }
                 }
 
-                sb.append("    ").append(fieldType).append(" ").append(field.fieldName());
+                sb.append("    ").append(fieldType).append(" ").append(NamingUtils.convertFullNaming(field.fieldName()));
                 sb.append(i < selectedFields.size() - 1 ? ",\n\n" : "\n");
             }
 

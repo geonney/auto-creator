@@ -24,8 +24,13 @@ public class ConfigPathHelper {
         return getSettingFile("database");
     }
 
+    public static File getUserDictionaryFile() {
+        log.info("✅ 사전 파일을 로드합니다.");
+        return getSettingFile("dictionary");
+    }
+
     public static File getSettingFile(String type) {
-        String settingFilename = type + "-config.json";
+        String settingFilename = ("dictionary".equals(type)) ? type + ".json" : type + "-config.json";
         File settingConfigFile = new File(settingPath + "/" + settingFilename);
         if (!settingConfigFile.exists()) {
             boolean result = settingConfigFile.getParentFile().mkdirs();
@@ -46,6 +51,7 @@ public class ConfigPathHelper {
                 log.info("설정파일을 생성했습니다.: {}", settingConfigFile.getAbsolutePath());
             } catch (IOException e) {
                 log.error("설정 파일을 생성하는데 실패하였습니다.", e);
+
             }
         }
         return settingConfigFile;

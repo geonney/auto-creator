@@ -2,6 +2,7 @@ package studio.geonlee.auto_creator.generator.layered;
 
 import studio.geonlee.auto_creator.common.record.EntityMetadata;
 import studio.geonlee.auto_creator.common.util.CaseUtils;
+import studio.geonlee.auto_creator.common.util.NamingUtils;
 import studio.geonlee.auto_creator.config.setting.DefaultConfigFileHandler;
 import studio.geonlee.auto_creator.config.dto.DefaultConfig;
 import studio.geonlee.auto_creator.config.setting.GlobalConfig;
@@ -15,8 +16,8 @@ public class ControllerGenerator {
         String domainBasePackage = config.getDomainBasePackage();
         String basePackage = domainBasePackage.replace(".domain", "");
         String tableName = meta.tableName().toLowerCase();
-        String domain = CaseUtils.extractDomain(tableName);
-        String pascalDomain = CaseUtils.toUppercaseFirstLetter(domain);
+        String domain = NamingUtils.convertFullNaming(CaseUtils.extractDomain(tableName));
+        String pascalDomain = CaseUtils.toUppercaseFirstLetter(NamingUtils.convertFullNaming(domain));
         String fullPackage = domainBasePackage + "." + domain;
 
         StringBuilder sb = new StringBuilder();

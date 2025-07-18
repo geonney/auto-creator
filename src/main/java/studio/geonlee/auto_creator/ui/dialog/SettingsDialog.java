@@ -2,6 +2,7 @@ package studio.geonlee.auto_creator.ui.dialog;
 
 import studio.geonlee.auto_creator.config.message.MessageUtil;
 import studio.geonlee.auto_creator.ui.frame.MainFrame;
+import studio.geonlee.auto_creator.ui.panel.DictionaryPanel;
 import studio.geonlee.auto_creator.ui.panel.GeneralSettingPanel;
 import studio.geonlee.auto_creator.ui.panel.GeneratorSettingPanel;
 
@@ -34,10 +35,10 @@ public class SettingsDialog extends JDialog {
         // 다국어 처리는 setCellRenderer 이벤트에서 처리
         DefaultMutableTreeNode generalNode = new DefaultMutableTreeNode("General");
         DefaultMutableTreeNode generatorNode = new DefaultMutableTreeNode("Generator");
-//        DefaultMutableTreeNode databaseNode = new DefaultMutableTreeNode(MessageUtil.get("tree.setting.database"));
+        DefaultMutableTreeNode dictionaryNode = new DefaultMutableTreeNode("Dictionary");
         root.add(generalNode);
         root.add(generatorNode);
-//        root.add(databaseNode);
+        root.add(dictionaryNode);
 
         menuTree = new JTree(root);
         menuTree.setRootVisible(false);
@@ -52,7 +53,7 @@ public class SettingsDialog extends JDialog {
 
         detailPanel.add(new GeneralSettingPanel(), "General");
         detailPanel.add(new GeneratorSettingPanel(mainFrame), "Generator");
-//        detailPanel.add(new JPanel(), MessageUtil.get("tree.setting.database"));
+        detailPanel.add(new DictionaryPanel(), "Dictionary");
 
         add(detailPanel, BorderLayout.CENTER);
 
@@ -68,6 +69,7 @@ public class SettingsDialog extends JDialog {
                     String label = switch (key) {
                         case "General" -> MessageUtil.get("tree.setting.general");
                         case "Generator" -> MessageUtil.get("tree.setting.generator");
+                        case "Dictionary" -> MessageUtil.get("tree.setting.dictionary");
                         default -> key;
                     };
                     setText(label);
@@ -84,6 +86,7 @@ public class SettingsDialog extends JDialog {
             switch (selected) {
                 case "General" -> cardLayout.show(detailPanel, "General");
                 case "Generator" -> cardLayout.show(detailPanel, "Generator");
+                case "Dictionary" -> cardLayout.show(detailPanel, "Dictionary");
             }
         });
 

@@ -4,6 +4,7 @@ import com.formdev.flatlaf.FlatDarculaLaf;
 import lombok.extern.slf4j.Slf4j;
 import studio.geonlee.auto_creator.config.setting.DatabaseConfigFileHandler;
 import studio.geonlee.auto_creator.config.setting.DefaultConfigFileHandler;
+import studio.geonlee.auto_creator.config.setting.DictionaryFileHandler;
 import studio.geonlee.auto_creator.config.setting.GlobalConfig;
 import studio.geonlee.auto_creator.ui.frame.MainFrame;
 
@@ -19,6 +20,7 @@ public class AutoCreatorApplication {
         // 테마 적용
         try {
             UIManager.setLookAndFeel(new FlatDarculaLaf());
+
             log.info("The application has been successfully run.");
         } catch (Exception e) {
             log.error("FlatLaf 테마 적용 실패");
@@ -40,12 +42,15 @@ public class AutoCreatorApplication {
                 //설정 파일 로드
                 DatabaseConfigFileHandler databaseConfigFileHandler = new DatabaseConfigFileHandler();
                 DefaultConfigFileHandler defaultConfigFileHandler = new DefaultConfigFileHandler();
+                DictionaryFileHandler dictionaryFileHandler = new DictionaryFileHandler();
                 GlobalConfig.defaultConfig = defaultConfigFileHandler.load();
                 GlobalConfig.databaseConfig = databaseConfigFileHandler.load();
+                GlobalConfig.dictionary = dictionaryFileHandler.load();
                 Thread.sleep(2000); // 예시로 3초 대기
                 // 여기에 초기화 로직 넣기
             } catch (InterruptedException | IOException e) {
                 log.error("Setting file load failure.");
+                System.exit(1);
             }
 
             // 3. 스플래시 닫고 메인 프레임 띄우기

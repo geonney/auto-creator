@@ -31,7 +31,7 @@ public class AboutDialog extends JDialog {
         // ✨ 살짝 아래로 내리는 여백
         textPanel.add(Box.createVerticalStrut(10));
 
-        JLabel titleLabel = new JLabel("Auto Code (v0.1.0)");
+        JLabel titleLabel = new JLabel("Auto Code (v1.0.0)");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
         titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 

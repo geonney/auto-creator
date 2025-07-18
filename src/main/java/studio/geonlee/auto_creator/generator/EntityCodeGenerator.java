@@ -5,6 +5,7 @@ import studio.geonlee.auto_creator.common.enumeration.LogType;
 import studio.geonlee.auto_creator.common.record.FieldMetadata;
 import studio.geonlee.auto_creator.common.util.CaseUtils;
 import studio.geonlee.auto_creator.common.util.DatabaseMetaReader;
+import studio.geonlee.auto_creator.common.util.NamingUtils;
 import studio.geonlee.auto_creator.config.dto.DefaultConfig;
 import studio.geonlee.auto_creator.config.setting.GlobalConfig;
 import studio.geonlee.auto_creator.ui.frame.MainFrame;
@@ -31,13 +32,15 @@ public class EntityCodeGenerator {
             StringBuilder sb = new StringBuilder();
 
             DefaultConfig config = GlobalConfig.defaultConfig;
+            System.out.println(config.getBaseEntityColumnField());
             String entityBasePackage = config.getEntityBasePackage();
             String baseEntityPackage = entityBasePackage + (".base");
             List<String> baseEntityFields = new ArrayList<>();
-            if (config.getBaseEntityColumnField().trim().isEmpty()) {
+            if (!config.getBaseEntityColumnField().trim().isEmpty()) {
                 baseEntityFields = Arrays.asList(config.getBaseEntityColumnField()
                         .replaceAll("\\s", "").split(","));
             }
+            System.out.println(baseEntityFields);
             sb.append("package ").append(entityBasePackage).append(";").append("\n\n");
             if (config.isUseBaseEntity()) {
                 sb.append("import ").append(baseEntityPackage).append(".BaseEntity;").append("\n\n");
@@ -45,7 +48,6 @@ public class EntityCodeGenerator {
             sb.append("import jakarta.persistence.*;\n");
             sb.append("import lombok.Getter;\n");
             sb.append("import lombok.NoArgsConstructor;\n");
-//            sb.append("import lombok.AllArgsConstructor;\n");
             sb.append("import java.time.*;\n\n");
             boolean usesBigDecimal = fields.stream()
                     .anyMatch(f -> f.javaType().equals("BigDecimal"));
@@ -73,7 +75,8 @@ public class EntityCodeGenerator {
                     }
                     sb.append("    @Id\n");
                     sb.append(generateColumnAnnotation(field));
-                    sb.append("    private ").append(field.javaType()).append(" ").append(field.fieldName()).append(";\n\n");
+                    sb.append("    private ").append(field.javaType()).append(" ")
+                            .append(NamingUtils.convertFullNaming(field.fieldName())).append(";\n\n");
                 }
             }
 
@@ -86,7 +89,8 @@ public class EntityCodeGenerator {
                     sb.append("    /** ").append(field.comment()).append(" */\n");
                 }
                 sb.append(generateColumnAnnotation(field));
-                sb.append("    private ").append(field.javaType()).append(" ").append(field.fieldName()).append(";\n\n");
+                sb.append("    private ").append(field.javaType()).append(" ")
+                        .append(NamingUtils.convertFullNaming(field.fieldName())).append(";\n\n");
             }
 
             //생성자
@@ -100,8 +104,9 @@ public class EntityCodeGenerator {
                 if (config.isUseBaseEntity() && baseEntityFields.contains(field.fieldName())) {
                     continue;
                 }
-                sb.append("        this.").append(field.fieldName())
-                        .append(" = request.").append(field.fieldName()).append("();\n");
+                String fullName = NamingUtils.convertFullNaming(field.fieldName());
+                sb.append("        this.").append(fullName)
+                        .append(" = request.").append(fullName).append("();\n");
             }
             sb.append("    }\n\n");
             //수정 메서드 (immutable 하기 때문에 mapper 사용 X)
@@ -111,8 +116,9 @@ public class EntityCodeGenerator {
                 if (config.isUseBaseEntity() && baseEntityFields.contains(field.fieldName())) {
                     continue;
                 }
-                sb.append("        this.").append(field.fieldName())
-                        .append(" = request.").append(field.fieldName()).append("();\n");
+                String fullName = NamingUtils.convertFullNaming(field.fieldName());
+                sb.append("        this.").append(fullName)
+                        .append(" = request.").append(fullName).append("();\n");
             }
             sb.append("    }\n\n");
 
@@ -169,7 +175,8 @@ public class EntityCodeGenerator {
                 sb.append("    /** ").append(field.comment()).append(" */\n");
             }
             sb.append(generateColumnAnnotation(field));
-            sb.append("    private ").append(field.javaType()).append(" ").append(field.fieldName()).append(";\n\n");
+            sb.append("    private ").append(field.javaType()).append(" ")
+                    .append(NamingUtils.convertFullNaming(field.fieldName())).append(";\n\n");
         }
 
         sb.append("}\n");

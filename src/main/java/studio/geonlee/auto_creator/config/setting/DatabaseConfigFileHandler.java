@@ -31,7 +31,8 @@ public class DatabaseConfigFileHandler {
             File databaseConfigFile = ConfigPathHelper.getUserDatabaseConfigFile();
             return mapper.readValue(databaseConfigFile, DatabaseConfig.class);
         } catch (IOException e) {
-            MainFrame.log("❌ 데이터베이스 설정 파일 로딩 실패: " + e.getMessage(), LogType.EXCEPTION);
+            log.error(e.getMessage(), e);
+//            MainFrame.log("❌ 데이터베이스 설정 파일 로딩 실패: " + e.getMessage(), LogType.EXCEPTION);
             throw e;
         }
     }

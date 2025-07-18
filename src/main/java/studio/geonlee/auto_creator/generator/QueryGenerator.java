@@ -3,6 +3,7 @@ package studio.geonlee.auto_creator.generator;
 import studio.geonlee.auto_creator.common.record.EntityMetadata;
 import studio.geonlee.auto_creator.common.record.FieldMetadata;
 import studio.geonlee.auto_creator.common.util.CaseUtils;
+import studio.geonlee.auto_creator.common.util.NamingUtils;
 
 import java.util.List;
 
@@ -39,14 +40,14 @@ public class QueryGenerator {
             sb.append("\n");
         }
 
-        sb.append("  FROM ").append(meta.schema()).append(".").append(meta.tableName()).append("\n");
+        sb.append("  FROM ").append(meta.tableName()).append("\n");
         sb.append(" WHERE 1=1");
         return sb.toString();
     }
 
     private static String generateInsert(EntityMetadata meta) {
         StringBuilder sb = new StringBuilder();
-        sb.append("INSERT INTO ").append(meta.schema()).append(".").append(meta.tableName()).append(" (\n");
+        sb.append("INSERT INTO ").append(meta.tableName()).append(" (\n");
 
         List<FieldMetadata> fields = meta.fields().stream()
                 .filter(f -> !f.primaryKey()) // ✅ 보통 PK는 INSERT 안함
@@ -61,7 +62,8 @@ public class QueryGenerator {
         sb.append(") VALUES (\n");
 
         for (int i = 0; i < fields.size(); i++) {
-            sb.append("    #{").append(CaseUtils.toCamelCase(fields.get(i).columnName())).append("}");
+            String variableName = NamingUtils.convertFullNaming(CaseUtils.toCamelCase(fields.get(i).columnName()));
+            sb.append("    #{").append(variableName).append("}");
             if (i < fields.size() - 1) sb.append(",");
             sb.append("\n");
         }
@@ -72,7 +74,7 @@ public class QueryGenerator {
 
     private static String generateUpdate(EntityMetadata meta) {
         StringBuilder sb = new StringBuilder();
-        sb.append("UPDATE ").append(meta.schema()).append(".").append(meta.tableName()).append("\n");
+        sb.append("UPDATE ").append(meta.tableName()).append("\n");
         sb.append("   SET");
 
         List<FieldMetadata> fields = meta.fields().stream()
@@ -80,8 +82,9 @@ public class QueryGenerator {
                 .toList();
 
         for (int i = 0; i < fields.size(); i++) {
+            String variableName = NamingUtils.convertFullNaming(CaseUtils.toCamelCase(fields.get(i).columnName()));
             sb.append(" ").append(fields.get(i).columnName())
-                    .append(" = #{").append(CaseUtils.toCamelCase(fields.get(i).columnName())).append("}");
+                    .append(" = #{").append(variableName).append("}");
             if (i < fields.size() - 1) {
                 sb.append(",");
                 sb.append("\n      ");
@@ -95,8 +98,9 @@ public class QueryGenerator {
                 .toList();
 
         for (int i = 0; i < pkFields.size(); i++) {
+            String variableName = NamingUtils.convertFullNaming(CaseUtils.toCamelCase(fields.get(i).columnName()));
             sb.append(pkFields.get(i).columnName())
-                    .append(" = #{").append(CaseUtils.toCamelCase(pkFields.get(i).columnName())).append("}\n");
+                    .append(" = #{").append(variableName).append("}\n");
             if (i < pkFields.size() - 1) sb.append("   AND ");
         }
         return sb.toString();
@@ -104,7 +108,7 @@ public class QueryGenerator {
 
     private static String generateDelete(EntityMetadata meta) {
         StringBuilder sb = new StringBuilder();
-        sb.append("DELETE FROM ").append(meta.schema()).append(".").append(meta.tableName()).append("\n");
+        sb.append("DELETE FROM ").append(meta.tableName()).append("\n");
         sb.append(" WHERE");
 
         List<FieldMetadata> pkFields = meta.fields().stream()
@@ -112,8 +116,9 @@ public class QueryGenerator {
                 .toList();
 
         for (int i = 0; i < pkFields.size(); i++) {
+            String variableName = NamingUtils.convertFullNaming(CaseUtils.toCamelCase(pkFields.get(i).columnName()));
             sb.append(" ").append(pkFields.get(i).columnName()).append(" = #{")
-                    .append(CaseUtils.toCamelCase(pkFields.get(i).columnName())).append("}\n");
+                    .append(variableName).append("}\n");
             if (i < pkFields.size() - 1) sb.append("   AND");
         }
         return sb.toString();
