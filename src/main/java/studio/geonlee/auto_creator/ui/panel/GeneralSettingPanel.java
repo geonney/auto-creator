@@ -17,7 +17,7 @@ import java.awt.*;
 public class GeneralSettingPanel extends JPanel {
 
     private final JTextField entityPackageField = new JTextField(30);
-    private final JTextField recordPackageField = new JTextField(30);
+    private final JTextField basePackageField = new JTextField(30);
     private final JTextField savePathField = new JTextField(30);
     private final JLabel themeLabel = new JLabel();
     //프로그램 시작시 마지막 DB 연결의 복원
@@ -32,7 +32,7 @@ public class GeneralSettingPanel extends JPanel {
 
         // 입력 필드 크기 제한
         entityPackageField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 28));
-        recordPackageField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 28));
+        basePackageField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 28));
         savePathField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 28));
 
 
@@ -51,7 +51,7 @@ public class GeneralSettingPanel extends JPanel {
         add(createSection(
                 MessageUtil.get("domain.base.package.title"),
                 MessageUtil.get("domain.base.package.description"),
-                recordPackageField
+                basePackageField
         ));
 
         add(createSection(
@@ -156,7 +156,7 @@ public class GeneralSettingPanel extends JPanel {
         DefaultConfig config = GlobalConfig.defaultConfig;
         if (config != null) {
             entityPackageField.setText(config.getEntityBasePackage());
-            recordPackageField.setText(config.getDomainBasePackage());
+            basePackageField.setText(config.getDomainBasePackage());
             savePathField.setText(config.getDefaultSavePath());
             themeLabel.setText(config.getTheme());
             autoLoadDatabaseCheck.setSelected(config.isAutoLoadDatabaseOnStart());
@@ -171,7 +171,7 @@ public class GeneralSettingPanel extends JPanel {
             if (config == null) config = new DefaultConfig();
 
             config.setEntityBasePackage(entityPackageField.getText().trim());
-            config.setDomainBasePackage(recordPackageField.getText().trim());
+            config.setDomainBasePackage(basePackageField.getText().trim());
             config.setDefaultSavePath(savePathField.getText().trim());
             config.setAutoLoadDatabaseOnStart(autoLoadDatabaseCheck.isSelected());
             config.setExpandTree(expandTreeCheck.isSelected());

@@ -1,12 +1,15 @@
 package studio.geonlee.auto_creator.generator;
 
 import studio.geonlee.auto_creator.common.enumeration.DatabaseType;
+import studio.geonlee.auto_creator.common.enumeration.LogType;
 import studio.geonlee.auto_creator.common.record.FieldMetadata;
 import studio.geonlee.auto_creator.common.util.CaseUtils;
 import studio.geonlee.auto_creator.common.util.DatabaseMetaReader;
 import studio.geonlee.auto_creator.config.dto.DefaultConfig;
 import studio.geonlee.auto_creator.config.setting.GlobalConfig;
+import studio.geonlee.auto_creator.ui.frame.MainFrame;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -30,7 +33,11 @@ public class EntityCodeGenerator {
             DefaultConfig config = GlobalConfig.defaultConfig;
             String entityBasePackage = config.getEntityBasePackage();
             String baseEntityPackage = entityBasePackage + (".base");
-            List<String> baseEntityFields = Arrays.asList(config.getBaseEntityColumnField().replaceAll("\\s", "").split(","));
+            List<String> baseEntityFields = new ArrayList<>();
+            if (config.getBaseEntityColumnField().trim().isEmpty()) {
+                baseEntityFields = Arrays.asList(config.getBaseEntityColumnField()
+                        .replaceAll("\\s", "").split(","));
+            }
             sb.append("package ").append(entityBasePackage).append(";").append("\n\n");
             if (config.isUseBaseEntity()) {
                 sb.append("import ").append(baseEntityPackage).append(".BaseEntity;").append("\n\n");
@@ -119,7 +126,8 @@ public class EntityCodeGenerator {
             return sb.toString();
 
         } catch (Exception e) {
-            return "// ❌ Entity 생성 실패: " + e.getMessage();
+            MainFrame.log("// ❌ Entity 생성 실패: " + e.getMessage(), LogType.EXCEPTION);
+            return "";
         }
     }
 
