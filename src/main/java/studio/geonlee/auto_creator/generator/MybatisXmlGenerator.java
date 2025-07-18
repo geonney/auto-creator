@@ -77,7 +77,7 @@ public class MybatisXmlGenerator {
         // DELETE
         sb.append("    <delete id=\"delete\" parameterType=\"")
                 .append(domainPackage).append(".record.").append(pascalDomain).append("DeleteRequestRecord\">\n");
-        sb.append("        DELETE FROM ").append(".").append(tableName).append("\n");
+        sb.append("        DELETE FROM ").append(tableName).append("\n");
         sb.append("        WHERE\n");
         for (int i = 0; i < pkFields.size(); i++) {
             FieldMetadata pk = pkFields.get(i);
@@ -101,7 +101,7 @@ public class MybatisXmlGenerator {
             if (i < meta.fields().size() - 1) sb.append(",");
             sb.append("\n");
         }
-        sb.append("        FROM ").append(".").append(tableName).append("\n");
+        sb.append("        FROM ").append(tableName).append("\n");
         sb.append("        WHERE 1=1\n");
 
         // ✅ 동적 조건 with null + empty check for String
